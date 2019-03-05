@@ -68,6 +68,7 @@ export default {
       }
     },
     handleLogin () {
+      this.$router.push('/')
     }
   }
 }

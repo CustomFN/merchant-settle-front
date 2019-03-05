@@ -1,0 +1,30 @@
+{
+    "code": 200,
+    "msg": "",
+    "data": [
+        {
+            "id": 1,
+            "roleId": "1",
+            "roleName": "管理员",
+            "description": "拥有所有权限",
+            "ctime": "2019-03-05",
+            "status": 1
+        },
+        {
+            "id": 2,
+            "roleId": "2",
+            "roleName": "客户管理员",
+            "description": "能够管理客户模块",
+            "ctime": "2019-03-05",
+            "status": 1
+        },
+        {
+            "id": 3,
+            "roleId": "3",
+            "roleName": "门店管理员",
+            "description": "能够管理门店模块",
+            "ctime": "2019-03-05",
+            "status": 1
+        }
+    ]
+}

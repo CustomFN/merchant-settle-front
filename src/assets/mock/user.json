@@ -1,0 +1,39 @@
+{
+    "code": 200,
+    "msg": "",
+    "data": [
+        {
+            "id": 1,
+            "userId": "zhujiakun",
+            "userName": "朱家琨",
+            "roleNameList": [
+                "1",
+                "2"
+            ],
+            "ctime": "2019-03-05",
+            "status": 1
+        },
+        {
+            "id": 2,
+            "userId": "zhujiakun02",
+            "userName": "朱家琨",
+            "roleNameList": [
+                "1",
+                "2"
+            ],
+            "ctime": "2019-03-05",
+            "status": 1
+        },
+        {
+            "id": 3,
+            "userId": "zhujiakun03",
+            "userName": "朱家琨",
+            "roleNameList": [
+                "1",
+                "2"
+            ],
+            "ctime": "2019-03-05",
+            "status": 1
+        }
+    ]
+}
