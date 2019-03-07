@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 
 import Axios from 'axios'
+import AMap from 'vue-amap'
 
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
@@ -13,8 +14,15 @@ import '@/assets/iconfont/iconfont.css'
 import '@/styles/index.scss' // global css
 
 Vue.use(ElementUI)
+Vue.use(AMap)
 Vue.prototype.$axios = Axios
 Vue.config.productionTip = false
+
+AMap.initAMapApiLoader({
+  key: '4941757d2d8d9a21017936b95e9be40a',
+  plugin: ['AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType'],
+  v: '1.4.4'
+})
 
 /* eslint-disable no-new */
 new Vue({

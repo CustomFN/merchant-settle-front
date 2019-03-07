@@ -116,8 +116,8 @@ export default {
         },
         {
           'id': 1,
-          'userId': 'zhujiakun',
-          'userName': '朱家琨',
+          'userId': 'zhujiakun02',
+          'userName': '朱家琨02',
           'roleNameList': [
             '1',
             '2'
@@ -127,8 +127,8 @@ export default {
         },
         {
           'id': 1,
-          'userId': 'zhujiakun',
-          'userName': '朱家琨',
+          'userId': 'zhujiakun03',
+          'userName': '朱家琨03',
           'roleNameList': [
             '1',
             '2'
