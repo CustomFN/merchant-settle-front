@@ -19,7 +19,7 @@
            <el-button type="primary" @click="doFilter()"><i class="el-icon-search"></i>搜索</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" >新增</el-button>
+          <el-button type="primary" @click="isShowAddVisible = true">新增</el-button>
         </el-form-item>
       </el-form>
     </el-col>
@@ -62,7 +62,32 @@
                     style="text-align:center;">
     </el-pagination>
 
-    <!-- 新增编辑院校 -->
+    <!-- 新增用户 -->
+    <el-dialog title="创建用户" :visible.sync="isShowAddVisible">
+      <el-form label-width="80px" :model="submitForm" ref="dataForm">
+        <el-form-item label="姓名拼音">
+          <el-input v-model="submitForm.userNameSpell"></el-input>
+        </el-form-item>
+        <el-form-item label="姓名">
+          <el-input v-model="submitForm.userName"></el-input>
+        </el-form-item>
+        <el-form-item label="状态" v-model="submitForm.status">
+         <el-select v-model="submitForm.status" placeholder="启用状态">
+            <el-option v-for="item in status"
+                       :label="item.label"
+                       :value="item.statusId"
+                       :key="item.statusId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isShowAddVisible = false">取消</el-button>
+        <el-button type="primary" :loading="listLoading" class="title1">确定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 编辑用户 -->
     <el-dialog title="Edit" :visible.sync="isShowEditVisible">
       <el-form label-width="80px" :model="temp" ref="dataForm">
         <el-form-item label="姓名" prop="cname">
@@ -139,6 +164,7 @@ export default {
       ],
       listLoading: true,
       isShowEditVisible: false,
+      isShowAddVisible: false,
       deleteVisible: false,
       temp: {
         id: '',
@@ -146,6 +172,11 @@ export default {
         userName: '',
         roleNameList: [],
         ctime: '',
+        status: ''
+      },
+      submitForm: {
+        userNameSpell: '',
+        userName: '',
         status: ''
       },
       total: 0,

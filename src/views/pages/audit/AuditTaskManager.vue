@@ -28,7 +28,7 @@
               <el-table-column prop="applicationTime" label="申请时间" width="250"></el-table-column>
               <el-table-column prop="commitor" label="提交人" width="200"></el-table-column>
               <el-table-column label="操作">
-                <el-button type="text" @click="handleAudit()">分配</el-button>
+                <el-button type="text" @click="isShowDistributionVisible = true">分配</el-button>
                 <el-button type="text" @click="handleView()">查看</el-button>
               </el-table-column>
             </el-table>
@@ -59,6 +59,18 @@
           </div>
         </el-tabs>
       </div>
+
+      <el-dialog title="分配处理人" :visible.sync="isShowDistributionVisible">
+        <el-form label-width="80px">
+          <el-form-item label="处理人">
+            <el-input v-model="handler"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="isShowDistributionVisible = false">取消</el-button>
+          <el-button type="primary" class="title1">分配</el-button>
+        </div>
+      </el-dialog>
   </div>
 </template>
 
@@ -66,6 +78,8 @@
 export default {
   data () {
     return {
+      isShowDistributionVisible: false,
+      handler: '',
       searchParam: {
         customerId: '',
         poiId: '',

@@ -31,10 +31,10 @@
           <el-table-column prop="customerPrincipal" label="客户责任人" width="200"></el-table-column>
           <el-table-column prop="customerStatus" label="客户状态" width="200"></el-table-column>
           <el-table-column label="操作">
-            <el-button type="text">编辑</el-button>
-            <el-button type="text">删除</el-button>
+            <el-button type="text" @click="handleUpdate()">编辑</el-button>
+            <el-button type="text" @click="deleteVisible = true">删除</el-button>
             <el-button type="text" @click="showOpLog()">操作记录</el-button>
-            <el-button type="text">分配责任人</el-button>
+            <el-button type="text" @click="isShowDistributionVisible = true">分配责任人</el-button>
           </el-table-column>
         </el-table>
       </div>
@@ -50,6 +50,30 @@
         </el-pagination>
       </div>
     </el-card>
+
+    <el-dialog title="分配责任人" :visible.sync="isShowDistributionVisible">
+      <el-form label-width="100px">
+        <el-form-item label="客户责任人">
+          <el-input v-model="customerPrincipal"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isShowDistributionVisible = false">取消</el-button>
+        <el-button type="primary" class="title1">分配</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 删除弹框 -->
+    <el-dialog
+      title="删除"
+      :visible.sync="deleteVisible"
+      width="30%">
+      <span>确认删除吗</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="deleteVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitDelete">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -57,6 +81,9 @@
 export default {
   data () {
     return {
+      isShowDistributionVisible: false,
+      deleteVisible: false,
+      customerPrincipal: '',
       searchParam: {
         customerId: '',
         customerName: '',
@@ -90,8 +117,13 @@ export default {
     }
   },
   methods: {
+    handleUpdate () {
+      this.$router.push('/customer/customerinfo')
+    },
     createCustomer () {
       this.$router.push('/customer/customerinfo')
+    },
+    submitDelete () {
     },
     showOpLog () {
       this.$router.push('/customer/customeroplog')

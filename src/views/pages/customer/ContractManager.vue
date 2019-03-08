@@ -32,7 +32,7 @@
           <el-table-column prop="contractValidTime" label="合同有效期" width="120"></el-table-column>
           <el-table-column prop="contractType" label="合同类型" width="120"></el-table-column>
           <el-table-column label="操作">
-            <el-button type="text">查看</el-button>
+            <el-button type="text" @click="handleShowView()">查看</el-button>
           </el-table-column>
         </el-table>
       </div>
@@ -48,6 +48,60 @@
         </el-pagination>
       </div>
     </el-card>
+
+    <div class="contract-dialog">
+      <el-dialog title="合同信息" :visible.sync="isShowViewVisible">
+        <el-form label-width="150px"  :model="showViewForm" size="medium">
+          <el-form-item label="合同类型">
+            <el-select v-model="showViewForm.customerContractType">
+              <el-option label="商家与平台合同" value="1"></el-option>
+              <el-option label="商家与代理商合同" value="2"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="合同编号">
+            <el-input v-model="showViewForm.customerContractNum"></el-input>
+          </el-form-item>
+          <el-form-item label="合同有效期">
+            <el-col :span="11">
+              <el-date-picker type="date" placeholder="选择日期" v-model="showViewForm.contractEndTime" style="width: 100%;"></el-date-picker>
+            </el-col>
+          </el-form-item>
+          <el-form-item label="甲方">
+            <el-input v-model="showViewForm.partyA.party" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="甲方联系人">
+            <el-input v-model="showViewForm.partyA.partyContactPerson"></el-input>
+          </el-form-item>
+          <el-form-item label="甲方联系人电话号码">
+            <el-input v-model="showViewForm.partyA.partyContactPersonPhone"></el-input>
+          </el-form-item>
+          <el-form-item label="甲方签约时间">
+            <el-input v-model="showViewForm.partyA.signTime"></el-input>
+          </el-form-item>
+          <el-form-item label="乙方">
+            <el-input v-model="showViewForm.partyB.party" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="乙方联系人">
+            <el-input v-model="showViewForm.partyB.partyContactPerson"></el-input>
+          </el-form-item>
+          <el-form-item label="乙方联系人电话号码">
+            <el-input v-model="showViewForm.partyB.partyContactPersonPhone"></el-input>
+          </el-form-item>
+          <el-form-item label="乙方签约时间">
+            <el-input v-model="showViewForm.partyB.signTime"></el-input>
+          </el-form-item>
+          <el-form-item label="合同扫描件">
+            <el-upload class="avatar-uploader" :show-file-list="false" action="" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+              <img v-if="showViewForm.contractScan" :src="showViewForm.contractScan" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="isShowViewVisible = false">确定</el-button>
+        </div>
+      </el-dialog>
+    </div>
   </div>
 </template>
 
@@ -55,6 +109,7 @@
 export default {
   data () {
     return {
+      isShowViewVisible: false,
       searchParam: {
         customerId: '',
         contractId: '',
@@ -94,12 +149,48 @@ export default {
         contractValidTime: '2020-03-07',
         contractType: '纸质合同'
       }],
+      showViewForm: {
+        customerContractType: '',
+        customerContractNum: '',
+        contractEndTime: '',
+        contractScan: '',
+        partyA: {
+          party: '',
+          partyContactPerson: '',
+          partyContactPersonPhone: '',
+          signTime: ''
+        },
+        partyB: {
+          party: '',
+          partyContactPerson: '',
+          partyContactPersonPhone: '',
+          signTime: ''
+        }
+      },
       total: 0,
       page: 1,
       pageSize: 10
     }
   },
   methods: {
+    handleShowView () {
+      this.isShowViewVisible = true
+    },
+    handleAvatarSuccess (res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw)
+    },
+    beforeAvatarUpload (file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 / 1024 < 2
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!')
+      }
+      return isJPG && isLt2M
+    },
     handleSizeChange (val) {
       this.page = val
       console.log(this.page)
@@ -129,6 +220,32 @@ export default {
   margin-top: 20px;
   .pagination {
     margin-top: 10px;
+  }
+}
+.contract-dialog {
+  text-align: left;
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
   }
 }
 </style>

@@ -1,0 +1,5 @@
+export { default as WmPoiBaseInfo } from '@/views/pages/poi/components/WmPoiBaseInfo'
+export { default as WmPoiQua } from '@/views/pages/poi/components/WmPoiQua'
+export { default as WmPoiDeliveryInfo } from '@/views/pages/poi/components/WmPoiDeliveryInfo'
+export { default as WmPoiSettleInfo } from '@/views/pages/poi/components/WmPoiSettleInfo'
+export { default as WmPoiBusinessInfo } from '@/views/pages/poi/components/WmPoiBusinessInfo'

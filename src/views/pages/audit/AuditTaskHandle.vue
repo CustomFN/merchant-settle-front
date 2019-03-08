@@ -28,8 +28,8 @@
               <el-table-column prop="applicationTime" label="申请时间" width="250"></el-table-column>
               <el-table-column prop="commitor" label="提交人" width="200"></el-table-column>
               <el-table-column label="操作">
-                <el-button type="text" @click="handleAudit(taskId)">处理</el-button>
-                <el-button type="text" @click="handleView(taskId)">查看</el-button>
+                <el-button type="text" @click="handleAudit()">处理</el-button>
+                <el-button type="text" @click="handleView()">查看</el-button>
               </el-table-column>
             </el-table>
           </el-tab-pane>
@@ -41,7 +41,7 @@
               <el-table-column prop="applicationTime" label="申请时间" width="250"></el-table-column>
               <el-table-column prop="commitor" label="提交人" width="200"></el-table-column>
               <el-table-column label="操作">
-                <el-button type="text" @click="handleView(taskId)">查看</el-button>
+                <el-button type="text" @click="handleView()">查看</el-button>
               </el-table-column>
             </el-table>
           </el-tab-pane>
@@ -102,10 +102,10 @@ export default {
     }
   },
   methods: {
-    handleAudit (taskId) {
-      alert(taskId)
+    handleAudit () {
+      this.$router.push('/audit/auditwmpoibaseinfo')
     },
-    handleView (taskId) {
+    handleView () {
       this.$router.push('/audit/auditcustomer')
     },
     handleSizeChange (val) {

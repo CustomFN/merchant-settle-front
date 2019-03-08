@@ -67,22 +67,40 @@ export const constantRouterMap = [
       {
         path: 'physicalpoilist',
         name: '物理门店列表',
+        component: () => import('@/views/pages/poi/PhysicalPoiListManager'),
         meta: { title: '物理门店列表' }
       },
       {
         path: 'physicalpoi',
         name: '我的物理门店',
+        component: () => import('@/views/pages/poi/PhysicalPoiManager'),
         meta: { title: '我的物理门店' }
       },
       {
         path: 'wmpoilist',
         name: '外卖门店列表',
+        component: () => import('@/views/pages/poi/WmPoiListManager'),
         meta: { title: '外卖门店列表' }
       },
       {
         path: 'wmpoi',
         name: '我的外卖门店',
+        component: () => import('@/views/pages/poi/WmPoiManager'),
         meta: { title: '我的外卖门店' }
+      },
+      {
+        path: 'physicalpoiinfo',
+        name: '物理门店信息',
+        component: () => import('@/views/pages/poi/PhysicalPoiInfo'),
+        hidden: true,
+        meta: { title: '物理门店信息' }
+      },
+      {
+        path: 'wmpoiinfo',
+        name: '外卖门店信息',
+        component: () => import('@/views/pages/poi/WmPoiInfo'),
+        hidden: true,
+        meta: { title: '外卖门店信息' }
       }
     ]
   },

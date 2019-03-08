@@ -19,7 +19,7 @@
            <el-button type="primary" @click="doFilter()"><i class="el-icon-search"></i>搜索</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" >新增</el-button>
+          <el-button type="primary" @click="isShowAddVisible = true">新增</el-button>
         </el-form-item>
       </el-form>
     </el-col>
@@ -62,7 +62,32 @@
                     style="text-align:center;">
     </el-pagination>
 
-    <!-- 新增编辑院校 -->
+    <!-- 新增角色 -->
+    <el-dialog title="Edit" :visible.sync="isShowAddVisible">
+      <el-form label-width="80px" :model="temp" ref="dataForm">
+        <el-form-item label="角色名称" prop="cname">
+          <el-input v-model="temp.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="cname">
+          <el-input v-model="temp.description"></el-input>
+        </el-form-item>
+        <el-form-item label="状态" v-model="temp.status">
+         <el-select v-model="temp.status" placeholder="启用状态">
+            <el-option v-for="item in status"
+                       :label="item.label"
+                       :value="item.statusId"
+                       :key="item.statusId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isShowAddVisible = false">取消</el-button>
+        <el-button type="primary" :loading="listLoading" class="title1">确定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 编辑角色 -->
     <el-dialog title="Edit" :visible.sync="isShowEditVisible">
       <el-form label-width="80px" :model="temp" ref="dataForm">
         <el-form-item label="角色名称" prop="cname">
@@ -83,7 +108,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="isShowEditVisible = false">取消</el-button>
-        <el-button type="primary" :loading="listLoading" @click="updateData" class="title1">确定</el-button>
+        <el-button type="primary" :loading="listLoading" class="title1">确定</el-button>
       </div>
     </el-dialog>
 
@@ -133,6 +158,7 @@ export default {
       ],
       listLoading: true,
       isShowEditVisible: false,
+      isShowAddVisible: false,
       deleteVisible: false,
       temp: {
         id: '',

@@ -4,6 +4,10 @@
       <el-row>
         <el-col :span="8">
           <div class="grid-content bg-purple">
+            <el-button type="primary" >添加一级菜单</el-button>
+            <el-button type="primary" >添加子节点</el-button>
+          </div>
+          <div class="grid-content bg-purple">
             <div class="resourceTree">
               <el-tree
                 :data="data2"
@@ -36,7 +40,7 @@
                   <el-input v-model="form.description"></el-input>
                 </el-form-item>
                 <el-form-item label="创建时间">
-                  <el-input v-model="form.ctime" disabled="true"></el-input>
+                  <el-input v-model="form.ctime" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="启用">
                   <el-switch
@@ -46,20 +50,10 @@
                   </el-switch>
                 </el-form-item>
               </el-form>
+              <div class="grid-content bg-purple resourceBtn">
+                <el-button type="primary" @click="onSubmit">修改并保存</el-button>
+              </div>
             </div>
-          </div>
-        </el-col>
-      </el-row>
-      <el-row >
-        <el-col :span="8">
-          <div class="grid-content bg-purple resourceBtn">
-            <el-button type="primary" >添加一级菜单</el-button>
-            <el-button type="primary" >添加子节点</el-button>
-          </div>
-        </el-col>
-        <el-col :span="16">
-          <div class="grid-content bg-purple resourceBtn">
-            <el-button type="primary" @click="onSubmit">修改并保存</el-button>
           </div>
         </el-col>
       </el-row>
@@ -164,6 +158,6 @@ export default {
   float: left;
 }
 .resourceBtn {
-  float: left;
+  text-align: center;
 }
 </style>
