@@ -32,7 +32,12 @@
         <el-input v-model="submitForm.physicalPoiLatitude"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-amap vid="amap" :center="center" :zoom="zoom" :plugin="plugin" style="height:480px;"></el-amap>
+        <div class="amap-page-container">
+          <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
+          <el-amap vid="physicalPoiMap" :center="mapCenter" :zoom="14" :events="events" class="amap-demo">
+            <el-amap-marker v-for="(marker, index) in markers" :key="index" :position="marker" ></el-amap-marker>
+          </el-amap>
+        </div>
       </el-form-item>
       <el-form-item size="large">
         <el-button type="primary" @click="onSubmit">保存并提交</el-button>
@@ -48,38 +53,54 @@ export default {
     let self = this
     return {
       submitForm: {
-        id: '',
-        customerType: '',
-        customerCertificatesPic: '',
-        customerCertificatesNum: '',
-        customerName: '',
-        customerLegalPerson: '',
-        customerCertificatesAddress: '',
-        icustomerValidTimed: ''
+        physicalCityId: '',
+        physicalRegionId: '',
+        physicalPoiPhone: '',
+        physicalPoiCategory: '',
+        physicalPoiAddress: '',
+        physicalPoiLongitude: '',
+        physicalPoiLatitude: ''
       },
-      zoom: 16,
-      center: [121.59996, 31.197646],
-      plugin: [{
-        pName: 'Geolocation',
-        events: {
-          init (o) {
-            o.getCurrentPosition((status, result) => {
-              if (result && result.position) {
-                self.lng = result.position.lng
-                self.lat = result.position.lat
-                self.center = [self.lng, self.lat]
-                self.loaded = true
-                self.$nextTick()
-              }
-            })
-          }
+      markers: [],
+      searchOption: {
+        city: '北京',
+        citylimit: false
+      },
+      mapCenter: [121.59996, 31.197646],
+      events: {
+        click (e) {
+          let { lng, lat } = e.lnglat
+          self.submitForm.physicalPoiLongitude = lng
+          self.submitForm.physicalPoiLatitude = lat
+
+          self.markers = []
+          self.markers.push([self.submitForm.physicalPoiLongitude, self.submitForm.physicalPoiLatitude])
         }
-      }]
+      }
     }
   },
   methods: {
     onSubmit () {
       console.log('submit!')
+    },
+    onSearchResult (pois) {
+      let latSum = 0
+      let lngSum = 0
+      if (pois.length > 0) {
+        pois.forEach(poi => {
+          let {lng, lat} = poi
+          lngSum += lng
+          latSum += lat
+          this.markers.push([poi.lng, poi.lat])
+        })
+        let center = {
+          lng: lngSum / pois.length,
+          lat: latSum / pois.length
+        }
+        this.mapCenter = [center.lng, center.lat]
+        this.submitForm.physicalPoiLongitude = center.lng
+        this.submitForm.physicalPoiLatitude = center.lat
+      }
     }
   }
 }
@@ -93,5 +114,16 @@ export default {
   .el-form {
     width: 780px;
   }
+}
+.amap-demo {
+  height: 300px;
+}
+.search-box {
+  position: absolute;
+  top: 25px;
+  left: 20px;
+}
+.amap-page-container {
+  position: relative;
 }
 </style>

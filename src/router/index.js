@@ -77,16 +77,16 @@ export const constantRouterMap = [
         meta: { title: '我的物理门店' }
       },
       {
-        path: 'wmpoilist',
-        name: '外卖门店列表',
-        component: () => import('@/views/pages/poi/WmPoiListManager'),
-        meta: { title: '外卖门店列表' }
-      },
-      {
         path: 'wmpoi',
         name: '我的外卖门店',
         component: () => import('@/views/pages/poi/WmPoiManager'),
         meta: { title: '我的外卖门店' }
+      },
+      {
+        path: 'wmpoilist',
+        name: '外卖门店列表',
+        component: () => import('@/views/pages/poi/WmPoiListManager'),
+        meta: { title: '外卖门店列表' }
       },
       {
         path: 'physicalpoiinfo',

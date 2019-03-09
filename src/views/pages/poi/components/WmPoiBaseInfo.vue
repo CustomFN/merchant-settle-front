@@ -40,7 +40,19 @@
           <el-form-item label="门店地址">
             <el-input v-model="submitForm.wmPoiAddress"></el-input>
           </el-form-item>
-          <el-form-item label="门店坐标">
+          <el-form-item label="门店坐标/经度">
+            <el-input v-model="submitForm.wmPoiLongitude"></el-input>
+          </el-form-item>
+          <el-form-item label="门店坐标/维度">
+            <el-input v-model="submitForm.wmPoiLatitude"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <div class="amap-page-container">
+              <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
+              <el-amap vid="wmPoiBaseInfoMap" :center="mapCenter" :zoom="14" :events="events" class="amap-demo">
+                  <el-amap-marker v-for="(marker, index) in markers" :key="index" :position="marker" ></el-amap-marker>
+              </el-amap>
+            </div>
           </el-form-item>
           <el-form-item label="门店LOGO">
             <el-upload class="avatar-uploader" :show-file-list="false" action="" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
@@ -67,6 +79,7 @@
 export default {
   name: 'WmPoiBaseInfo',
   data () {
+    let self = this
     return {
       submitForm: {
         customerId: '',
@@ -88,7 +101,25 @@ export default {
       }, {
         value: '选项2',
         label: '双皮奶'
-      }]
+      }],
+      markers: [
+        [121.59996, 31.197646]
+      ],
+      searchOption: {
+        city: '北京',
+        citylimit: false
+      },
+      mapCenter: [121.59996, 31.197646],
+      events: {
+        click (e) {
+          let { lng, lat } = e.lnglat
+          self.submitForm.wmPoiLongitude = lng
+          self.submitForm.wmPoiLatitude = lat
+
+          self.markers = []
+          self.markers.push([self.submitForm.wmPoiLongitude, self.submitForm.wmPoiLatitude])
+        }
+      }
     }
   },
   methods: {
@@ -108,6 +139,25 @@ export default {
         this.$message.error('上传头像图片大小不能超过 2MB!')
       }
       return isJPG && isLt2M
+    },
+    onSearchResult (pois) {
+      let latSum = 0
+      let lngSum = 0
+      if (pois.length > 0) {
+        pois.forEach(poi => {
+          let {lng, lat} = poi
+          lngSum += lng
+          latSum += lat
+          this.markers.push([poi.lng, poi.lat])
+        })
+        let center = {
+          lng: lngSum / pois.length,
+          lat: latSum / pois.length
+        }
+        this.mapCenter = [center.lng, center.lat]
+        this.submitForm.wmPoiLongitude = center.lng
+        this.submitForm.wmPoiLatitude = center.lat
+      }
     }
   }
 }
@@ -147,5 +197,16 @@ export default {
     height: 178px;
     display: block;
   }
+}
+.amap-demo {
+  height: 350px;
+}
+.search-box {
+  position: absolute;
+  top: 25px;
+  left: 20px;
+}
+.amap-page-container {
+  position: relative;
 }
 </style>

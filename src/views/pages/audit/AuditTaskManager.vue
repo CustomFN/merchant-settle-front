@@ -119,7 +119,7 @@ export default {
     handleAudit () {
     },
     handleView () {
-      this.$router.push('/audit/auditwmpoibaseinfo')
+      this.$router.push('/audit/auditwmpoideliveryinfo')
     },
     handleSizeChange (val) {
       this.page = val

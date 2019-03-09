@@ -4,7 +4,16 @@
       <div class="container-left">
         <el-col :span="10">
           <el-tabs type="border-card">
-            <el-tab-pane label="地图坐标审核"></el-tab-pane>
+            <el-tab-pane label="地图坐标审核">
+              <div class="audit-map">
+                <div class="amap-page-container">
+                  <el-amap vid="auditWmPoiDeliveryInfomap" :center="mapCenter" ref="map" :zoom="14" class="amap-demo">
+                    <el-amap-marker v-for="(marker, index) in markers" :key="index" :position="marker" ></el-amap-marker>
+                    <el-amap-circle v-for="circle in circles" :center="circle.center" :radius="circle.radius" :fill-opacity="circle.fillOpacity"></el-amap-circle>
+                  </el-amap>
+                </div>
+              </div>
+            </el-tab-pane>
           </el-tabs>
         </el-col>
       </div>
@@ -54,7 +63,18 @@ export default {
         minMoney: '12',
         minDeliveryPrice: '8',
         dispatcherMoney: '5'
-      }]
+      }],
+      mapCenter: [121.59996, 31.197646],
+      markers: [
+        [121.59996, 31.197646]
+      ],
+      circles: [
+        {
+          center: [121.59996, 31.197646],
+          radius: 1000,
+          fillOpacity: 0.5
+        }
+      ]
     }
   }
 }
@@ -65,8 +85,11 @@ export default {
   text-align: left;
   margin-left: 30px;
   padding: 0%;
-  .audit-pic {
-    width: 480px
+  .audit-map {
+    width: 570px
+  }
+  .amap-demo {
+    height: 350px;
   }
 }
 .container-right-bottom, .container-right-bottom-btn {

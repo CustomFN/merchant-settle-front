@@ -20,7 +20,7 @@ Vue.config.productionTip = false
 
 AMap.initAMapApiLoader({
   key: '4941757d2d8d9a21017936b95e9be40a',
-  plugin: ['AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType'],
+  plugin: ['AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.Geolocation', 'Geocoder', 'AMap.MouseTool'],
   v: '1.4.4'
 })
 

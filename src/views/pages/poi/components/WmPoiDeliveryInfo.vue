@@ -15,7 +15,7 @@
       <el-form-item label="配送方案">
         <el-tabs type="border-card">
           <el-tab-pane label="正常时段">
-            <div class="container-core-left">
+            <div>
               <el-form ref="form" :model="submitForm" label-width="80px" size="small">
                 <el-form-item label="起送价/元">
                   <el-input v-model="submitForm.wmPoiProjectList.minDeliveryPrice"></el-input>
@@ -24,12 +24,15 @@
                   <el-input v-model="submitForm.wmPoiProjectList.minDeliveryPrice"></el-input>
                 </el-form-item>
                 <el-form-item label="配送范围">
-                  <el-button>开始标注</el-button>
+                  <el-button disabled>开始标注</el-button>
                 </el-form-item>
               </el-form>
             </div>
-            <div class="container-core-right">
-
+            <div class="amap-page-container">
+              <el-amap vid="wmPoiDeliveryInfoMap" :center="mapCenter" ref="map" :zoom="14" class="amap-demo">
+                <el-amap-marker v-for="(marker, index) in markers" :key="index" :position="marker" ></el-amap-marker>
+                <el-amap-circle v-for="circle in circles" :center="circle.center" :radius="circle.radius" :fill-opacity="circle.fillOpacity"></el-amap-circle>
+              </el-amap>
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -45,7 +48,20 @@
 export default {
   name: 'WmPoiDeliveryInfo',
   data () {
+    let self = this
     return {
+      deliveryTypes: ['平台配送', '商家自配'],
+      mapCenter: [121.59996, 31.197646],
+      markers: [
+        [121.59996, 31.197646]
+      ],
+      circles: [
+        {
+          center: [121.59996, 31.197646],
+          radius: 1000,
+          fillOpacity: 0.5
+        }
+      ],
       submitForm: {
         wmDeliveryType: [],
         poportion: '',
@@ -54,10 +70,12 @@ export default {
           minDeliveryPrice: '',
           dispatcherMoney: '',
           deliveryAreaType: '',
-          deliveryArea: []
+          deliveryRadius: 1000,
+          deliveryArea: [
+            [121.59996, 31.197646]
+          ]
         }]
-      },
-      deliveryTypes: ['平台配送', '商家自配']
+      }
     }
   },
   methods: {
@@ -72,13 +90,9 @@ export default {
   text-align: left;
   margin: 20px;
   width: 780px;
-  float: left;
-  .el-form {
-    width: 100%;
-  }
-  .container-core-left {
-    width: 150px;
-    float: left;
-  }
+  float: left
+}
+.amap-demo {
+  height: 350px;
 }
 </style>

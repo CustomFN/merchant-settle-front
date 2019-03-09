@@ -10,7 +10,12 @@
             </el-tab-pane>
             <el-tab-pane label="地图坐标审核">
             <div class="audit-map">
-              <el-amap class="amap-box" :vid="'amap-vue'"></el-amap>
+              <div class="amap-page-container">
+                <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
+                <el-amap vid="auditWmPoiBaseInfomap" :center="mapCenter" :zoom="14" :events="events" class="amap-demo">
+                  <el-amap-marker v-for="(marker, index) in markers" :key="index" :position="marker" ></el-amap-marker>
+                </el-amap>
+              </div>
             </div>
             </el-tab-pane>
           </el-tabs>
@@ -74,7 +79,42 @@ export default {
         wmPoiAddress: '北京市朝阳区望京国际研发园',
         wmPoiLongitude: '1.111111',
         wmPoiLatitude: '1.111111'
-      }]
+      }],
+      markers: [
+        [121.59996, 31.197646]
+      ],
+      searchOption: {
+        city: '北京',
+        citylimit: false
+      },
+      mapCenter: [121.59996, 31.197646],
+      events: {
+        click (e) {
+          let { lng, lat } = e.lnglat
+
+          self.markers = []
+          self.markers.push([lng, lat])
+        }
+      }
+    }
+  },
+  methods: {
+    onSearchResult (pois) {
+      let latSum = 0
+      let lngSum = 0
+      if (pois.length > 0) {
+        pois.forEach(poi => {
+          let {lng, lat} = poi
+          lngSum += lng
+          latSum += lat
+          this.markers.push([poi.lng, poi.lat])
+        })
+        let center = {
+          lng: lngSum / pois.length,
+          lat: latSum / pois.length
+        }
+        this.mapCenter = [center.lng, center.lat]
+      }
     }
   }
 }
@@ -86,11 +126,21 @@ export default {
   margin-left: 30px;
   padding: 0%;
   .audit-pic, .audit-map {
-    width: 480px
+    width: 570px
   }
 }
 .container-right-bottom, .container-right-bottom-btn {
   margin-top: 10px
 }
-
+.amap-demo {
+  height: 350px;
+}
+.search-box {
+  position: absolute;
+  top: 25px;
+  left: 20px;
+}
+.amap-page-container {
+  position: relative;
+}
 </style>
