@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 
 import Axios from 'axios'
+import qs from 'qs'
 import AMap from 'vue-amap'
 
 import ElementUI from 'element-ui'
@@ -15,6 +16,7 @@ import '@/styles/index.scss' // global css
 
 Vue.use(ElementUI)
 Vue.use(AMap)
+Vue.prototype.$qs = qs
 Vue.prototype.$axios = Axios
 Vue.config.productionTip = false
 

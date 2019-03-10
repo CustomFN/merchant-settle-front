@@ -30,7 +30,7 @@
       </el-form-item>
       <el-form-item label="有效期">
         <el-col :span="11">
-          <el-date-picker type="date" placeholder="选择日期" v-model="submitForm.customerValidTime" style="width: 100%;"></el-date-picker>
+          <el-date-picker type="date" editable placeholder="选择日期" v-model="submitForm.customerValidTime" style="width: 100%;"></el-date-picker>
         </el-col>
       </el-form-item>
       <el-form-item size="large">
@@ -53,7 +53,7 @@ export default {
         customerName: '',
         customerLegalPerson: '',
         customerCertificatesAddress: '',
-        icustomerValidTimed: ''
+        customerValidTimed: new Date('2019-12-12')
       }
     }
   },

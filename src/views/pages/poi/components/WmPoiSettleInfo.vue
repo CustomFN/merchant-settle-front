@@ -4,8 +4,8 @@
       <el-form label-width="150px"  :model="submitForm" size="medium">
         <el-form-item label="账户类型">
           <el-radio-group v-model="submitForm.settleAccType">
-            <el-radio :label="1" value='1'>对公</el-radio>
-            <el-radio :label="2" value='2'>对私</el-radio>
+            <el-radio :label="1" value=1>对公</el-radio>
+            <el-radio :label="2" value=2>对私</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="开户名">
@@ -31,16 +31,15 @@
           <el-input v-model="submitForm.settleAccNo"></el-input>
         </el-form-item>
         <el-form-item label="开户证件类型">
-          <el-select v-model="submitForm.financialOfficerCertificatesType">
-            <el-option label="身份证" value="1"></el-option>
-            <el-option label="港澳通行证" value="2"></el-option>
+          <el-select v-model="submitForm.financialOfficerCertificatesType" placeholder="请选择">
+            <el-option v-for="item in certificatesTypes" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="证件编号">
           <el-input v-model="submitForm.financialOfficerCertificatesNum"></el-input>
         </el-form-item>
         <el-form-item label="银行预留手机号">
-          <el-input v-model="submitForm.reservePhoneNum" disabled></el-input>
+          <el-input v-model="submitForm.reservePhoneNum"></el-input>
         </el-form-item>
         <el-form-item label="财务负责人">
           <el-input v-model="submitForm.financialOfficer"></el-input>
@@ -50,16 +49,16 @@
         </el-form-item>
         <el-form-item label="结算方式">
           <el-radio-group v-model="submitForm.settleType">
-            <el-radio :label="1" value='1'>系统自动结算</el-radio>
-            <el-radio :label="2" value='2'>商家自提</el-radio>
+            <el-radio :label="1" value=1>系统自动结算</el-radio>
+            <el-radio :label="2" value=2>商家自提</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="结算周期">
           <el-radio-group v-model="submitForm.settleCycle">
-            <el-radio :label="1" value='1'>3天</el-radio>
-            <el-radio :label="2" value='2'>7天</el-radio>
-            <el-radio :label="3" value='3'>30天</el-radio>
-            <el-radio :label="4" value='4'>每月最后一天</el-radio>
+            <el-radio :label="1" value=1>3天</el-radio>
+            <el-radio :label="2" value=2>7天</el-radio>
+            <el-radio :label="3" value=3>30天</el-radio>
+            <el-radio :label="4" value=4>每月最后一天</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="最低结算金额/元">
@@ -82,26 +81,33 @@ export default {
         settleAccType: 1,
         settleAccName: '',
         settleAccNo: '',
-        province: '',
-        city: '',
-        bankId: '',
-        branchId: '',
+        province: 1,
+        city: 2,
+        bankId: 2,
+        branchId: 1,
         branchName: '',
         reservePhoneNum: '',
         financialOfficer: '',
         financialOfficerPhone: '',
-        financialOfficerCertificatesType: '',
+        financialOfficerCertificatesType: 2,
         financialOfficerCertificatesNum: '',
         settleType: 1,
         settleCycle: 1,
         settleMinAmount: ''
       },
       options: [{
-        value: '选项1',
+        value: 1,
         label: '黄金糕'
       }, {
-        value: '选项2',
+        value: 2,
         label: '双皮奶'
+      }],
+      certificatesTypes: [{
+        value: 1,
+        label: '身份证'
+      }, {
+        value: 2,
+        label: '港澳通行证'
       }]
     }
   },

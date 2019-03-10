@@ -48,7 +48,6 @@
 export default {
   name: 'WmPoiDeliveryInfo',
   data () {
-    let self = this
     return {
       deliveryTypes: ['平台配送', '商家自配'],
       mapCenter: [121.59996, 31.197646],

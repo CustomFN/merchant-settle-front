@@ -43,7 +43,7 @@
       </el-table-column>
       <el-table-column prop="operation" label="操作" width="250px">
         <template slot-scope="scope" >
-         <el-button size="small" type="primary"  @click="handleUpdate(scope.row)">编辑</el-button>
+         <el-button size="small" type="primary"  @click="handleUpdate(scope.row.userId)">编辑</el-button>
          <el-button v-if="scope.row.status!='2'" size="mini" type="success" @click="handleModifyStatus(scope.row,'2')">启用
           </el-button>
           <el-button v-if="scope.row.status!='1'" size="mini" @click="handleModifyStatus(scope.row,'1')">禁用
@@ -211,6 +211,15 @@ export default {
   methods: {
     fetchData () {
       this.listLoading = false
+      // this.$axios({
+      //   method: 'get',
+      //   url: 'user.json'
+      // }).then(function (response) {
+      //   console.log(response)
+      // }).catch(function (error) {
+      //   console.log(error)
+      // })
+      
       // getList(this.listQuery).then(response => {
       //   const limit = 10
       //   const pageList = response.data.filter((item, index) => index < limit * this.page && index >= limit * (this.page - 1))
@@ -246,10 +255,10 @@ export default {
     clickfun (e) {
       console.log(e.target.innerText)
     },
-    handleUpdate (row) {
+    handleUpdate (userId) {
       this.isShowEditVisible = true
-      this.temp = Object.assign({}, row)
-      console.log(row)
+      // this.temp = Object.assign({}, userId)
+      console.log(userId)
     },
     deleteUpdate (row) {
       console.log(row)
