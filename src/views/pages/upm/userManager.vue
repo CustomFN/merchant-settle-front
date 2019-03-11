@@ -3,7 +3,7 @@
     <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
       <el-form :inline="true">
         <el-form-item>
-          <el-select v-model="value" clearable placeholder="状态">
+          <el-select v-model="searchParam.status" clearable placeholder="状态">
               <el-option
                 v-for="item in status"
                 :key="item.statusId"
@@ -12,8 +12,11 @@
               </el-option>
           </el-select>
         </el-form-item>
-                <el-form-item >
-          <el-input placeholder="姓名" v-model="searchName"></el-input>
+        <el-form-item >
+          <el-input placeholder="用户ID" v-model="searchParam.userId"></el-input>
+        </el-form-item>
+        <el-form-item >
+          <el-input placeholder="用户名" v-model="searchParam.userName"></el-input>
         </el-form-item>
         <el-form-item>
            <el-button type="primary" @click="doFilter()"><i class="el-icon-search"></i>搜索</el-button>
@@ -24,10 +27,12 @@
       </el-form>
     </el-col>
     <!--列表-->
-    <el-table :data="tableList" v-loading="listLoading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table :data="tableList"  border style="width: 100%;">
       <el-table-column prop="id" label="序号" width="90px">
       </el-table-column>
       <el-table-column prop="userId" label="用户ID" width="200px">
+      </el-table-column>
+      <el-table-column prop="userNameSpell" label="用户姓名拼写" width="200px">
       </el-table-column>
       <el-table-column prop="userName" label="用户姓名" width="200px">
       </el-table-column>
@@ -43,12 +48,8 @@
       </el-table-column>
       <el-table-column prop="operation" label="操作" width="250px">
         <template slot-scope="scope" >
-         <el-button size="small" type="primary"  @click="handleUpdate(scope.row.userId)">编辑</el-button>
-         <el-button v-if="scope.row.status!='2'" size="mini" type="success" @click="handleModifyStatus(scope.row,'2')">启用
-          </el-button>
-          <el-button v-if="scope.row.status!='1'" size="mini" @click="handleModifyStatus(scope.row,'1')">禁用
-          </el-button>
-          <el-button size="small" type="danger" @click="deleteUpdate(scope.row)">删除</el-button>
+         <el-button size="small" type="primary"  @click="showEdit(scope.row)">编辑</el-button>
+          <el-button size="small" type="danger" @click="showDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -82,19 +83,25 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
+        <el-button type="primary"  class="title1" @click="createUser()">创建</el-button>
         <el-button @click="isShowAddVisible = false">取消</el-button>
-        <el-button type="primary" :loading="listLoading" class="title1">确定</el-button>
       </div>
     </el-dialog>
 
     <!-- 编辑用户 -->
     <el-dialog title="Edit" :visible.sync="isShowEditVisible">
-      <el-form label-width="80px" :model="temp" ref="dataForm">
-        <el-form-item label="姓名" prop="cname">
-          <el-input v-model="temp.userName"></el-input>
+      <el-form label-width="80px" ref="dataForm">
+        <el-form-item label="用户ID">
+          <el-input v-model="submitForm.userId" disabled></el-input>
         </el-form-item>
-        <el-form-item label="状态" v-model="temp.status">
-         <el-select v-model="temp.status" placeholder="启用状态">
+        <el-form-item label="用户姓名">
+          <el-input v-model="submitForm.userName" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="submitForm.userPassword"></el-input>
+        </el-form-item>
+        <el-form-item label="状态" v-model="submitForm.status">
+         <el-select v-model="submitForm.status" placeholder="启用状态">
             <el-option v-for="item in status"
                        :label="item.label"
                        :value="item.statusId"
@@ -104,8 +111,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="isShowEditVisible = false">取消</el-button>
-        <el-button type="primary" :loading="listLoading" class="title1">确定</el-button>
+        <el-button @click="showEditVisiable(false)">取消</el-button>
+        <el-button type="primary" @click="submitEdit()"  class="title1">确定</el-button>
       </div>
     </el-dialog>
 
@@ -114,10 +121,10 @@
       title="删除"
       :visible.sync="deleteVisible"
       width="30%">
-      <span>确认删除吗</span>
+      <span>确认删除 {{ deleteUserId }} 吗</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="deleteVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitDelete">确 定</el-button>
+        <el-button type="primary" @click="submitDelete(deleteUserId)">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -125,59 +132,26 @@
 <script>
 
 export default {
+  inject: ['reload'],
   data () {
     return {
-      tableList: [
-        {
-          'id': 1,
-          'userId': 'zhujiakun',
-          'userName': '朱家琨',
-          'roleNameList': [
-            '1',
-            '2'
-          ],
-          'ctime': '2019-03-05',
-          'status': 1
-        },
-        {
-          'id': 1,
-          'userId': 'zhujiakun02',
-          'userName': '朱家琨02',
-          'roleNameList': [
-            '1',
-            '2'
-          ],
-          'ctime': '2019-03-05',
-          'status': 1
-        },
-        {
-          'id': 1,
-          'userId': 'zhujiakun03',
-          'userName': '朱家琨03',
-          'roleNameList': [
-            '1',
-            '2'
-          ],
-          'ctime': '2019-03-05',
-          'status': 1
-        }
-      ],
-      listLoading: true,
+      tableList: [],
       isShowEditVisible: false,
       isShowAddVisible: false,
       deleteVisible: false,
-      temp: {
-        id: '',
-        userId: '',
-        userName: '',
-        roleNameList: [],
-        ctime: '',
-        status: ''
-      },
       submitForm: {
+        userId: '',
         userNameSpell: '',
         userName: '',
+        userPassword: '',
         status: ''
+      },
+      searchParam: {
+        userId: '',
+        userName: '',
+        status: '',
+        pageNum: 1,
+        pageSize: 10
       },
       total: 0,
       page: 1,
@@ -187,13 +161,11 @@ export default {
           statusId: 1,
           label: '启用'
         }, {
-          statusId: 0,
+          statusId: 2,
           label: '禁用'
         }
       ],
-      value: '',
-      searchName: '',
-      filterTableDataEnd: []
+      deleteUserId: ''
     }
   },
   created () {
@@ -209,111 +181,121 @@ export default {
     }
   },
   methods: {
+    saveOrUpdateUser () {
+      let self = this
+      this.$axios.post('/api/user/save', this.$qs.stringify(self.submitForm), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        const _data = response.data
+        if (200 === _data.code) {
+          self.$message({
+            message: '保存修改成功',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (err) {
+        console.log(err.response)
+      })
+    },
+    createUser () {
+      this.saveOrUpdateUser()
+      this.isShowAddVisible = false
+      this.reload()
+    },
+    showEdit (row) {
+      this.showEditVisiable(true)
+      this.submitForm.userId = row.userId
+      this.submitForm.userNameSpell = row.userNameSpell
+      this.submitForm.userName = row.userName
+      this.submitForm.status = row.status
+    },
+    showEditVisiable (visiable) {
+      this.isShowEditVisible = visiable
+      this.resetSubmitForm()
+    },
+    submitEdit () {
+      this.saveOrUpdateUser()
+      this.showEditVisiable(false)
+    },
+    showDelete (row) {
+      this.deleteVisible = true
+      this.deleteUserId = row.userId
+    },
+    submitDelete (userId) {
+      let self = this
+      this.$axios.post('/api/user/delete', this.$qs.stringify({'userId': userId}), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        const _data = response.data
+        if (200 == _data.code) {
+          self.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (err) {
+        console.log(err.response)
+      })
+      this.deleteVisible = false
+      self.reload()
+    },
     fetchData () {
-      this.listLoading = false
-      // this.$axios({
-      //   method: 'get',
-      //   url: 'user.json'
-      // }).then(function (response) {
-      //   console.log(response)
-      // }).catch(function (error) {
-      //   console.log(error)
-      // })
-      
-      // getList(this.listQuery).then(response => {
-      //   const limit = 10
-      //   const pageList = response.data.filter((item, index) => index < limit * this.page && index >= limit * (this.page - 1))
-      //   console.log(pageList)
-      //   this.total = response.data.length
-      //   this.tableList = pageList
-      //   this.listLoading = false
-      // })
+      console.log(this.searchParam)
+      let self = this
+      this.$axios.post('/api/user/list', this.$qs.stringify(self.searchParam), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (200 === _data.code) {
+          self.tableList = _data.data.data
+          self.page = _data.data.pageNum
+          self.pageSize = _data.data.pageSize
+          self.total = _data.data.totalSize
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
     },
     doFilter () {
-      if (this.searchName === '') {
-        this.fetchData()
-        // this.$message.warning('查询条件不能为空！')
-        return
-      }
-      console.log(this.searchName)
-      // 每次手动将数据置空,因为会出现多次点击搜索情况
-      this.filterTableDataEnd = []
-      this.tableList.forEach((value, index) => {
-        if (value.userName) {
-          if (value.userName.indexOf(this.searchName) >= 0) {
-            this.filterTableDataEnd.push(value)
-            console.log(this.filterTableDataEnd)
-          }
-        }
-      })
-      // 页面数据改变重新统计数据数量和当前页
-      this.page = 1
-      this.total = this.filterTableDataEnd.length
-      // 渲染表格,根据值
-      this.currentChangePage(this.filterTableDataEnd)
-    },
-    clickfun (e) {
-      console.log(e.target.innerText)
-    },
-    handleUpdate (userId) {
-      this.isShowEditVisible = true
-      // this.temp = Object.assign({}, userId)
-      console.log(userId)
-    },
-    deleteUpdate (row) {
-      console.log(row)
-      this.deleteVisible = true
-      this.temp = Object.assign({}, row)
-      // console.log(row)
-    },
-    submitDelete () {
-      const tempData = Object.assign({}, this.temp)
-      console.log(tempData)
-      console.log(this.tableList)
-      for (const v of this.tableList) {
-        if (v.uid === this.temp.uid) {
-          const index = this.tableList.indexOf(v)
-          this.tableList.splice(index, 1)
-          this.fetchData()
-          console.log(this.tableList)
-          break
-        }
-      }
-      this.deleteVisible = false
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
-      })
-    },
-    handleModifyStatus (row, status) {
-      this.$message({
-        message: '操作成功',
-        type: 'success'
-      })
-      console.log(row)
-      row.status = status
+      this.fetchData()
     },
     handleSizeChange (val) {
-      this.page = val
+      this.searchParam.pageNum = val
       console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
-      this.page = val
+      this.searchParam.pageNum = val
       console.log(this.page)
       this.fetchData()
     },
-    currentChangePage (list) {
-      let from = (this.page - 1) * this.pageSize
-      const to = this.page * this.pageSize
-      this.tableList = []
-      for (; from < to; from++) {
-        if (list[from]) {
-          this.tableList.push(list[from])
-        }
-      }
+    resetSubmitForm () {
+      this.submitForm = {}
     }
   }
 }

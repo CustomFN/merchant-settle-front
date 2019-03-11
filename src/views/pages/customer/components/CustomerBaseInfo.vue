@@ -53,7 +53,7 @@ export default {
         customerName: '',
         customerLegalPerson: '',
         customerCertificatesAddress: '',
-        customerValidTimed: new Date('2019-12-12')
+        customerValidTimed: new Date()
       }
     }
   },

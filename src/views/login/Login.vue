@@ -1,18 +1,18 @@
 <template>
   <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-      <h3 class="title">vue-admin-template</h3>
-      <el-form-item prop="username">
+      <h3 class="title">外卖供应链上单系统</h3>
+      <el-form-item prop="userId">
         <span class="fontcontainer">
           <span class="iconfont icon-yonghu"></span>
         </span>
 
         <el-input
-            v-model="loginForm.username"
-            name="username"
+            v-model="loginForm.userId"
+            name="userId"
             type="text"
             auto-complete="on"
-            placeholder="username" />
+            placeholder="userId" />
       </el-form-item>
 
       <el-form-item prop="password">
@@ -47,8 +47,9 @@ export default {
   data () {
     return {
       loginForm: {
-        username: 'admin',
-        password: 'admin'
+        userId: 'admin',
+        password: 'admin',
+        rememberMe: false
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur' }],
@@ -68,7 +69,24 @@ export default {
       }
     },
     handleLogin () {
-      this.$router.push('/')
+      let self = this
+      self.$axios.post('/api/login', this.$qs.stringify(this.loginForm), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response.data)
+        const _data = response.data
+        if (200 == _data.code) {
+          self.$router.push('/')
+        } else {
+          alert(_data.msg)
+        }
+      }).catch(function (err) {
+        if (err.response) {
+          console.log(err.response)
+        }
+      })
     }
   }
 }

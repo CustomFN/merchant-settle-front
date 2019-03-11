@@ -34,6 +34,26 @@ export default {
   },
   methods: {
     logout () {
+      // let self = this
+      // self.$axios.post('/api/logout', {
+      //   headers: {
+      //     'Content-Type': 'application/x-www-form-urlencoded'
+      //   }
+      // }).then(function (response) {
+      //   console.log(response.data)
+      //   const _data = response.data
+      //   console.log(_data)
+      //   // if (200 == _data.code) {
+      //   //   self.$router.push('/')
+      //   // } else {
+      //   //   alert(_data.msg)
+      //   // }
+      // }).catch(function (err) {
+      //   if (err.response) {
+      //     console.log(err.response)
+      //   }
+      // })
+      this.$router.push('/login')
     }
   }
 }
