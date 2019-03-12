@@ -48,7 +48,8 @@
       </el-table-column>
       <el-table-column prop="operation" label="操作" width="250px">
         <template slot-scope="scope" >
-         <el-button size="small" type="primary"  @click="showEdit(scope.row)">编辑</el-button>
+          <el-button size="small" type="primary"  @click="showRole(scope.row)">角色</el-button>
+          <el-button size="small" type="primary"  @click="showEdit(scope.row)">编辑</el-button>
           <el-button size="small" type="danger" @click="showDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -90,7 +91,7 @@
 
     <!-- 编辑用户 -->
     <el-dialog title="Edit" :visible.sync="isShowEditVisible">
-      <el-form label-width="80px" ref="dataForm">
+      <el-form label-width="80px" :model="submitForm">
         <el-form-item label="用户ID">
           <el-input v-model="submitForm.userId" disabled></el-input>
         </el-form-item>
@@ -116,15 +117,60 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="UserRole" :visible.sync="isShowRoleVisible">
+      <el-form label-width="80px" :model="userRole">
+        <el-form-item label="用户ID">
+          <el-input v-model="userRole.userId" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="用户名称">
+          <el-input v-model="userRole.userName" disabled></el-input>
+        </el-form-item>
+      </el-form>
+      <div>
+        <el-form :inline="true" :model="roleSearchParam">
+          <el-form-item >
+            <el-input placeholder="角色名称" v-model="roleSearchParam.roleName"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="doFilterRole()"><i class="el-icon-search"></i>搜索</el-button>
+          </el-form-item>
+          </el-form>
+        <el-tree
+          :data="rolesTree"
+          show-checkbox
+          node-key="roleId"
+          default-expand-all
+          ref="tree"
+          :expand-on-click-node="false"
+          :props="defaultProps">
+        </el-tree>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="saveUserRole()">保存</el-button>
+        <el-button @click="isShowRoleVisible = false">取消</el-button>
+      </div>
+
+      <!--工具条-->
+      <el-pagination layout="total, prev, pager, next"
+                      background
+                      :page-size="10"
+                      @size-change="handleSearchSizeChange"
+                      :total="roleSearchParam.total"
+                      @current-change="handleSearchCurrentChange"
+                      style="text-align:center;">
+      </el-pagination>
+    </el-dialog>
+
     <!-- 删除弹框 -->
     <el-dialog
       title="删除"
       :visible.sync="deleteVisible"
+      :model="deleteParam"
       width="30%">
-      <span>确认删除 {{ deleteUserId }} 吗</span>
+      <span>确认删除 {{this.deleteParam.userName}}({{ this.deleteParam.userId }}) 吗</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="deleteVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitDelete(deleteUserId)">确 定</el-button>
+        <el-button type="primary" @click="submitDelete(this.deleteParam.userId)">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -136,6 +182,7 @@ export default {
   data () {
     return {
       tableList: [],
+      isShowRoleVisible: false,
       isShowEditVisible: false,
       isShowAddVisible: false,
       deleteVisible: false,
@@ -153,6 +200,16 @@ export default {
         pageNum: 1,
         pageSize: 10
       },
+      userRole: {
+        userId: '',
+        userName: '',
+        roleIdList: []
+      },
+      rolesTree: [],
+      defaultProps: {
+        id: 'roleId',
+        label: 'roleName'
+      },
       total: 0,
       page: 1,
       pageSize: 10,
@@ -165,7 +222,16 @@ export default {
           label: '禁用'
         }
       ],
-      deleteUserId: ''
+      deleteParam: {
+        userId: '',
+        userName: ''
+      },
+      roleSearchParam: {
+        roleName: '',
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
+      }
     }
   },
   created () {
@@ -215,7 +281,7 @@ export default {
       this.submitForm.userId = row.userId
       this.submitForm.userNameSpell = row.userNameSpell
       this.submitForm.userName = row.userName
-      this.submitForm.status = row.status
+      this.submitForm.status = 1
     },
     showEditVisiable (visiable) {
       this.isShowEditVisible = visiable
@@ -227,7 +293,8 @@ export default {
     },
     showDelete (row) {
       this.deleteVisible = true
-      this.deleteUserId = row.userId
+      this.deleteParam.userId = row.userId
+      this.deleteParam.userName = row.userName
     },
     submitDelete (userId) {
       let self = this
@@ -238,7 +305,7 @@ export default {
         }
       }).then(function (response) {
         const _data = response.data
-        if (200 == _data.code) {
+        if (200 === _data.code) {
           self.$message({
             message: '删除成功',
             type: 'success'
@@ -254,6 +321,66 @@ export default {
       })
       this.deleteVisible = false
       self.reload()
+    },
+    showRole (row) {
+      this.fetchRoleData()
+      this.userRole.userId = row.userId
+      this.userRole.userName = row.userName
+      this.isShowRoleVisible = true
+    },
+    saveUserRole () {
+      this.userRole.roleIdList = this.$refs.tree.getCheckedKeys()
+      console.log(this.userRole.roleIdList)
+
+      let self = this
+      this.$axios.post('/api/user/assignRoles', this.$qs.stringify(self.userRole), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        const _data = response.data
+        if (200 === _data.code) {
+          self.$message({
+            message: '保存成功',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (err) {
+        console.log(err.response)
+      })
+      this.isShowRoleVisible = false
+    },
+    fetchRoleData () {
+      console.log(this.roleSearchParam)
+      let self = this
+      this.$axios.post('/api/role/list', this.$qs.stringify(self.roleSearchParam), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (200 === _data.code) {
+          self.rolesTree = _data.data.data
+          self.roleSearchParam.pageNum = _data.data.pageNum
+          self.roleSearchParam.pageSize = _data.data.pageSize
+          self.roleSearchParam.total = _data.data.totalSize
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
     },
     fetchData () {
       console.log(this.searchParam)
@@ -284,6 +411,12 @@ export default {
     doFilter () {
       this.fetchData()
     },
+    doFilterRole () {
+      this.fetchRoleData()
+    },
+    resetSubmitForm () {
+      this.submitForm = {}
+    },
     handleSizeChange (val) {
       this.searchParam.pageNum = val
       console.log(this.page)
@@ -294,8 +427,13 @@ export default {
       console.log(this.page)
       this.fetchData()
     },
-    resetSubmitForm () {
-      this.submitForm = {}
+    handleSearchSizeChange (val) {
+      this.roleSearchParam.pageNum = val
+      this.fetchRoleData()
+    },
+    handleSearchCurrentChange (val) {
+      this.roleSearchParam.pageNum = val
+      this.fetchRoleData()
     }
   }
 }
