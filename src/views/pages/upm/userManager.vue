@@ -37,8 +37,16 @@
       <el-table-column prop="userName" label="用户姓名" width="200px">
       </el-table-column>
       <el-table-column prop="roleNameList" label="拥有角色" >
+        <template slot-scope="scope">
+          <el-tag size="small" :type="''" v-for="(item, index) in scope.row.roleNameList" :key="index">{{ item }}</el-tag>
+        </template>
       </el-table-column>
-      <el-table-column prop="ctime" label="创建时间" width="130px">
+      <el-table-column v-if="false" prop="roleIdList" label="拥有角色ID" >
+      </el-table-column>
+      <el-table-column  label="创建时间" width="130px">
+        <template slot-scope="scope">
+          <p>{{ scope.row.ctime | dateformat }}</p>
+        </template>
       </el-table-column>
       <el-table-column  label="状态" width="130px">
         <template slot-scope="scope">
@@ -256,7 +264,7 @@ export default {
         }
       }).then(function (response) {
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.$message({
             message: '保存修改成功',
             type: 'success'
@@ -277,11 +285,30 @@ export default {
       this.reload()
     },
     showEdit (row) {
-      this.showEditVisiable(true)
-      this.submitForm.userId = row.userId
-      this.submitForm.userNameSpell = row.userNameSpell
-      this.submitForm.userName = row.userName
-      this.submitForm.status = 1
+      this.resetSubmitForm()
+
+      let self = this
+      this.$axios.post('/api/user/show', this.$qs.stringify({'userId': row.userId}), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        const _data = response.data
+        if (_data.code === 200) {
+          self.submitForm = _data.data
+          self.submitForm.userPassword = ''
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (err) {
+        console.log(err.response)
+      })
+
+      this.isShowEditVisible = true
     },
     showEditVisiable (visiable) {
       this.isShowEditVisible = visiable
@@ -305,7 +332,7 @@ export default {
         }
       }).then(function (response) {
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.$message({
             message: '删除成功',
             type: 'success'
@@ -327,6 +354,11 @@ export default {
       this.userRole.userId = row.userId
       this.userRole.userName = row.userName
       this.isShowRoleVisible = true
+      this.$nextTick(function () {
+        if (row.roleIdList != null) {
+          this.$refs.tree.setCheckedKeys(row.roleIdList)
+        }
+      })
     },
     saveUserRole () {
       this.userRole.roleIdList = this.$refs.tree.getCheckedKeys()
@@ -340,7 +372,7 @@ export default {
         }
       }).then(function (response) {
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.$message({
             message: '保存成功',
             type: 'success'
@@ -367,7 +399,7 @@ export default {
       }).then(function (response) {
         console.log(response)
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.rolesTree = _data.data.data
           self.roleSearchParam.pageNum = _data.data.pageNum
           self.roleSearchParam.pageSize = _data.data.pageSize
@@ -393,7 +425,7 @@ export default {
       }).then(function (response) {
         console.log(response)
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.tableList = _data.data.data
           self.page = _data.data.pageNum
           self.pageSize = _data.data.pageSize

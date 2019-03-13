@@ -24,16 +24,21 @@
       </el-form>
     </el-col>
     <!--列表-->
-    <el-table :data="tableList" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table :data="tableList" border style="width: 100%;">
       <el-table-column prop="id" label="序号" width="90px">
       </el-table-column>
-      <el-table-column prop="roleId" label="角色ID" width="200px">
+      <el-table-column prop="roleId" label="角色ID" width="220px">
       </el-table-column>
       <el-table-column prop="roleName" label="角色姓名" width="200px">
       </el-table-column>
       <el-table-column prop="description" label="角色说明" >
       </el-table-column>
-      <el-table-column prop="ctime" label="创建时间" width="130px">
+      <el-table-column v-if="false" prop="resourceIdList" label="资源ID" >
+      </el-table-column>
+      <el-table-column label="创建时间" width="130px">
+        <template slot-scope="scope">
+          <p>{{ scope.row.ctime | dateformat }}</p>
+        </template>
       </el-table-column>
       <el-table-column  label="状态" width="130px">
         <template slot-scope="scope">
@@ -94,7 +99,10 @@
           <el-input v-model="submitForm.roleName"></el-input>
         </el-form-item>
         <el-form-item label="角色描述">
-          <el-input v-model="submitForm.ctime" disabled></el-input>
+          <el-input v-model="submitForm.description"></el-input>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-input :value="submitForm.ctime | dateformat" disabled></el-input>
         </el-form-item>
         <el-form-item label="状态" v-model="submitForm.status">
          <el-select v-model="submitForm.status" placeholder="启用状态">
@@ -228,7 +236,7 @@ export default {
         }
       }).then(function (response) {
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.$message({
             message: '保存修改成功',
             type: 'success'
@@ -249,12 +257,28 @@ export default {
       this.reload()
     },
     showEdit (row) {
-      this.showEditVisiable(true)
-      this.submitForm.roleId = row.roleId
-      this.submitForm.roleName = row.roleName
-      this.submitForm.description = row.description
-      this.submitForm.ctime = row.ctime
-      this.submitForm.status = row.status
+      this.resetSubmitForm()
+
+      let self = this
+      this.$axios.post('/api/role/show', this.$qs.stringify({'roleId': row.roleId}), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        const _data = response.data
+        if (_data.code === 200) {
+          self.submitForm = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (err) {
+        console.log(err.response)
+      })
+      this.isShowEditVisible = true
     },
     showEditVisiable (visiable) {
       this.isShowEditVisible = visiable
@@ -278,7 +302,7 @@ export default {
         }
       }).then(function (response) {
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.$message({
             message: '删除成功',
             type: 'success'
@@ -300,6 +324,11 @@ export default {
       this.roleResource.roleId = row.roleId
       this.roleResource.roleName = row.roleName
       this.isShowResourceVisible = true
+      this.$nextTick(function () {
+        if (row.resourceIdList != null) {
+          this.$refs.tree.setCheckedKeys(row.resourceIdList)
+        }
+      })
     },
     saveRoleResource () {
       this.roleResource.resourceIdList = this.$refs.tree.getCheckedKeys()
@@ -314,7 +343,7 @@ export default {
       }).then(function (response) {
         console.log(response)
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.$message({
             message: '保存成功',
             type: 'success'
@@ -341,7 +370,7 @@ export default {
       }).then(function (response) {
         console.log(response)
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.tableList = _data.data.data
           self.page = _data.data.pageNum
           self.pageSize = _data.data.pageSize
@@ -366,7 +395,7 @@ export default {
       }).then(function (response) {
         console.log(response)
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.resourcesTree = _data.data
         } else {
           self.$message({

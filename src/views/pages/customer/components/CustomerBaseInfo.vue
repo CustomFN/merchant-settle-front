@@ -6,13 +6,16 @@
       </el-form-item>
       <el-form-item label="客户类型">
         <el-select v-model="submitForm.customerType">
-          <el-option label="营业执照" value="1"></el-option>
-          <el-option label="个人证件" value="2"></el-option>
+          <el-option v-for="item in customerTypes" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="客户资质图片">
-        <el-upload class="avatar-uploader" :show-file-list="false" action="" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
-          <img v-if="submitForm.customerCertificatesPic" :src="submitForm.customerCertificatesPic" class="avatar">
+        <el-upload class="avatar-uploader" :show-file-list="false" :http-request="uploadPic" action="string" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" multiple>
+          <img v-if="submitForm.customerCertificatesPic[0]" :src="submitForm.customerCertificatesPic[0]" class="avatar">
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+        <el-upload class="avatar-uploader" :show-file-list="false" :http-request="uploadPic" action="string" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" multiple>
+          <img v-if="submitForm.customerCertificatesPic[1]" :src="submitForm.customerCertificatesPic[1]" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </el-form-item>
@@ -29,7 +32,7 @@
         <el-input v-model="submitForm.customerCertificatesAddress"></el-input>
       </el-form-item>
       <el-form-item label="有效期">
-        <el-col :span="11">
+        <el-col>
           <el-date-picker type="date" editable placeholder="选择日期" v-model="submitForm.customerValidTime" style="width: 100%;"></el-date-picker>
         </el-col>
       </el-form-item>
@@ -48,13 +51,20 @@ export default {
       submitForm: {
         id: '',
         customerType: '',
-        customerCertificatesPic: '',
+        customerCertificatesPic: [],
         customerCertificatesNum: '',
         customerName: '',
         customerLegalPerson: '',
         customerCertificatesAddress: '',
         customerValidTimed: new Date()
-      }
+      },
+      customerTypes: [{
+        value: 1,
+        label: '营业执照'
+      }, {
+        value: 2,
+        label: '个人证件'
+      }]
     }
   },
   methods: {
@@ -64,17 +74,45 @@ export default {
     handleAvatarSuccess (res, file) {
       this.imageUrl = URL.createObjectURL(file.raw)
     },
+    uploadPic (param) {
+      let self = this
+      let formData = new FormData()
+      formData.append('file', param.file)
+      formData.append('chunk','0')
+      this.$axios.post('/api/ui/upload', formData, {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(function (response) {
+        const _data = response.data
+        if (_data.code === 200) {
+          self.submitForm.customerCertificatesPic.push(_data.data)
+          self.$message({
+            message: '上传成功',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
     beforeAvatarUpload (file) {
       const isJPG = file.type === 'image/jpeg'
-      const isLt2M = file.size / 1024 / 1024 < 2
+      const isLt4M = file.size / 1024 / 1024 < 4
 
       if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
+        this.$message.error('上传图片只能是 JPG 格式!')
       }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!')
+      if (!isLt4M) {
+        this.$message.error('上传头像图片大小不能超过 4MB!')
       }
-      return isJPG && isLt2M
+      return isJPG && isLt4M
     }
   }
 }

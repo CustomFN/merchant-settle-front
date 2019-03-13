@@ -7,6 +7,7 @@ import router from './router'
 import Axios from 'axios'
 import qs from 'qs'
 import AMap from 'vue-amap'
+import moment from 'moment'
 
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
@@ -24,6 +25,14 @@ AMap.initAMapApiLoader({
   key: '4941757d2d8d9a21017936b95e9be40a',
   plugin: ['AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.Geolocation', 'Geocoder', 'AMap.MouseTool'],
   v: '1.4.4'
+})
+
+Vue.filter('dateformat', function (datatime, pattern = 'YYYY-MM-DD') {
+  if (datatime) {
+    return moment(datatime * 1000).format(pattern)
+  } else {
+    return datatime
+  }
 })
 
 /* eslint-disable no-new */

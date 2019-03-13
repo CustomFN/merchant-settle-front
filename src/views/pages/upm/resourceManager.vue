@@ -68,7 +68,7 @@
                   <el-input v-model="submitForm.sortOrder"></el-input>
                 </el-form-item>
                 <el-form-item label="创建时间">
-                  <el-input v-model="submitForm.ctime" disabled></el-input>
+                  <el-input :value="submitForm.ctime | dateformat" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="启用">
                   <el-select v-model="submitForm.status" placeholder="启用状态">
@@ -118,7 +118,7 @@
             <el-input v-model="submitForm.level"></el-input>
           </el-form-item>
           <el-form-item label="资源排序">
-            <el-input v-model="submitForm.sortOrder"></el-input>
+            <el-input v-model="submitForm.sortOrder" ></el-input>
           </el-form-item>
           <el-form-item label="状态" v-model="submitForm.status">
           <el-select v-model="submitForm.status" placeholder="启用状态">
@@ -197,7 +197,7 @@ export default {
       }).then(function (response) {
         console.log(response)
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.$message({
             message: '保存成功',
             type: 'success'
@@ -230,7 +230,7 @@ export default {
       }).then(function (response) {
         console.log(response)
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.resourcesTree = _data.data
         } else {
           self.$message({
@@ -266,7 +266,7 @@ export default {
         }
       }).then(function (response) {
         const _data = response.data
-        if (200 === _data.code) {
+        if (_data.code === 200) {
           self.$message({
             message: '删除成功',
             type: 'success'

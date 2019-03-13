@@ -87,34 +87,18 @@ export default {
       searchParam: {
         customerId: '',
         customerName: '',
-        customerPrincipal: ''
+        customerPrincipal: '',
+        pageNum: 1,
+        pageSize: 10
       },
-      tableData: [{
-        customerId: 1,
-        customerName: '客户1',
-        customerType: '营业执照',
-        customerPoiRelNum: 3,
-        customerPrincipal: '责任人1',
-        customerStatus: '审核中'
-      }, {
-        customerId: 2,
-        customerName: '客户2',
-        customerType: '个人证件',
-        customerPoiRelNum: 3,
-        customerPrincipal: '责任人2',
-        customerStatus: '审核中'
-      }, {
-        customerId: 3,
-        customerName: '客户3',
-        customerType: '营业执照',
-        customerPoiRelNum: 3,
-        customerPrincipal: '责任人3',
-        customerStatus: '审核中'
-      }],
+      tableData: [],
       total: 0,
       page: 1,
       pageSize: 10
     }
+  },
+  created () {
+    this.fetchData()
   },
   methods: {
     handleUpdate () {
@@ -128,25 +112,44 @@ export default {
     showOpLog () {
       this.$router.push('/customer/customeroplog')
     },
+    fetchData () {
+      console.log(this.searchParam)
+      let self = this
+      this.$axios.post('/api/customer/list', this.$qs.stringify(self.searchParam), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data.data
+          self.page = _data.data.pageNum
+          self.pageSize = _data.data.pageSize
+          self.total = _data.data.totalSize
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    doFilter () {
+      this.fetchData()
+    },
     handleSizeChange (val) {
-      this.page = val
+      this.searchParam.pageNum = val
       console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
-      this.page = val
+      this.searchParam.pageNum = val
       console.log(this.page)
       this.fetchData()
-    },
-    currentChangePage (list) {
-      let from = (this.page - 1) * this.pageSize
-      const to = this.page * this.pageSize
-      this.tableList = []
-      for (; from < to; from++) {
-        if (list[from]) {
-          this.tableList.push(list[from])
-        }
-      }
     }
   }
 }

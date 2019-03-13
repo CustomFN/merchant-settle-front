@@ -77,7 +77,7 @@ export default {
       }).then(function (response) {
         console.log(response.data)
         const _data = response.data
-        if (200 == _data.code) {
+        if (_data.code === 200) {
           self.$router.push('/')
         } else {
           alert(_data.msg)
