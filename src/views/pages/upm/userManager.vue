@@ -55,7 +55,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="operation" label="操作" width="250px">
-        <template slot-scope="scope" >
+        <template slot-scope="scope">
           <el-button size="small" type="primary"  @click="showRole(scope.row)">角色</el-button>
           <el-button size="small" type="primary"  @click="showEdit(scope.row)">编辑</el-button>
           <el-button size="small" type="danger" @click="showDelete(scope.row)">删除</el-button>

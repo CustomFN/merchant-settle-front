@@ -17,6 +17,7 @@ import '@/styles/index.scss' // global css
 
 Vue.use(ElementUI)
 Vue.use(AMap)
+Vue.prototype.$moment = moment
 Vue.prototype.$qs = qs
 Vue.prototype.$axios = Axios
 Vue.config.productionTip = false
@@ -29,7 +30,7 @@ AMap.initAMapApiLoader({
 
 Vue.filter('dateformat', function (datatime, pattern = 'YYYY-MM-DD') {
   if (datatime) {
-    return moment(datatime * 1000).format(pattern)
+    return moment.unix(datatime).format(pattern)
   } else {
     return datatime
   }

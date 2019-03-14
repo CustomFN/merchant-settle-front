@@ -29,12 +29,18 @@
           <el-table-column prop="customerType" label="客户类型" width="200"></el-table-column>
           <el-table-column prop="customerPoiRelNum" label="客户关联门店数" width="250"></el-table-column>
           <el-table-column prop="customerPrincipal" label="客户责任人" width="200"></el-table-column>
-          <el-table-column prop="customerStatus" label="客户状态" width="200"></el-table-column>
+          <el-table-column label="客户状态" width="200">
+            <template slot-scope="scope">
+              <el-tag type="success">{{ scope.row.customerStatus }}</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column label="操作">
-            <el-button type="text" @click="handleUpdate()">编辑</el-button>
-            <el-button type="text" @click="deleteVisible = true">删除</el-button>
-            <el-button type="text" @click="showOpLog()">操作记录</el-button>
-            <el-button type="text" @click="isShowDistributionVisible = true">分配责任人</el-button>
+            <template slot-scope="scope">
+              <el-button type="text" @click="handleUpdate(scope.row)">编辑</el-button>
+              <el-button type="text" @click="deleteVisible = true">删除</el-button>
+              <el-button type="text" @click="showOpLog()">操作记录</el-button>
+              <el-button type="text" @click="isShowDistributionVisible = true">分配责任人</el-button>
+            </template>
           </el-table-column>
         </el-table>
       </div>
@@ -78,6 +84,7 @@
 </template>
 
 <script>
+import Bus from './bus.js'
 export default {
   data () {
     return {
@@ -101,7 +108,8 @@ export default {
     this.fetchData()
   },
   methods: {
-    handleUpdate () {
+    handleUpdate (row) {
+      this.transferValue(row.customerId)
       this.$router.push('/customer/customerinfo')
     },
     createCustomer () {
@@ -150,6 +158,9 @@ export default {
       this.searchParam.pageNum = val
       console.log(this.page)
       this.fetchData()
+    },
+    transferValue (customerId) {
+      Bus.$emit('customerId', customerId)
     }
   }
 }

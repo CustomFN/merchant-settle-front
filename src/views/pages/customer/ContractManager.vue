@@ -27,10 +27,26 @@
           <el-table-column prop="partyASignerName" label="甲方签约人" width="120"></el-table-column>
           <el-table-column prop="partyBSignerName" label="乙方签约人" width="120"></el-table-column>
           <el-table-column prop="principal" label="合同责任人" width="150"></el-table-column>
-          <el-table-column prop="auditStatus" label="合同状态" width="100"></el-table-column>
-          <el-table-column prop="signerTime" label="签约时间" width="120"></el-table-column>
-          <el-table-column prop="contractValidTime" label="合同有效期" width="120"></el-table-column>
-          <el-table-column prop="contractType" label="合同类型" width="120"></el-table-column>
+          <el-table-column label="合同状态" width="100">
+            <template slot-scope="scope">
+              <el-tag size="small" type="success">{{ scope.row.auditStatus }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="signerTime" label="签约时间" width="120">
+            <template slot-scope="scope">
+              <p>{{ scope.row.signerTime | dateformat }}</p>
+            </template>  
+          </el-table-column>
+          <el-table-column label="合同有效期" width="120">
+            <template slot-scope="scope">
+              <p>{{ scope.row.contractValidTime | dateformat }}</p>
+            </template>
+          </el-table-column>
+          <el-table-column label="合同类型" width="120">
+            <template slot-scope="scope">
+              <el-tag size="small" type="">{{ scope.row.contractType }}</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column label="操作">
             <el-button type="text" @click="handleShowView()">查看</el-button>
           </el-table-column>
@@ -91,10 +107,15 @@
             <el-input v-model="showViewForm.partyB.signTime"></el-input>
           </el-form-item>
           <el-form-item label="合同扫描件">
-            <el-upload class="avatar-uploader" :show-file-list="false" action="" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
-              <img v-if="showViewForm.contractScan" :src="showViewForm.contractScan" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <el-upload class="avatar-uploader"
+              list-type="picture-card"
+              :on-preview="handlePicCardPreview"
+              multiple>
+              <i class="el-icon-plus"></i>
             </el-upload>
+            <el-dialog :visible.sync="isShowPicDialogVisible">
+              <img width="100%" :src="showViewForm.contractScanList" alt="">
+            </el-dialog>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -109,51 +130,19 @@
 export default {
   data () {
     return {
+      isShowPicDialogVisible: false,
       isShowViewVisible: false,
       searchParam: {
         customerId: '',
         contractId: '',
         contractNum: ''
       },
-      tableData: [{
-        contractId: 1,
-        contractNum: 'WM-P-10000001',
-        partyAName: '甲方1',
-        partyASignerName: '甲方签约人1',
-        partyBSignerName: '乙方签约人1',
-        principal: '朱家琨',
-        auditStatus: '审核中',
-        signerTime: '2019-03-07',
-        contractValidTime: '2020-03-07',
-        contractType: '纸质合同'
-      }, {
-        contractId: 2,
-        contractNum: 'WM-P-10000002',
-        partyAName: '甲方1',
-        partyASignerName: '甲方签约人2',
-        partyBSignerName: '乙方签约人2',
-        principal: '朱家琨',
-        auditStatus: '审核中',
-        signerTime: '2019-03-07',
-        contractValidTime: '2020-03-07',
-        contractType: '纸质合同'
-      }, {
-        contractId: 3,
-        contractNum: 'WM-P-10000003',
-        partyAName: '甲方1',
-        partyASignerName: '甲方签约人3',
-        partyBSignerName: '乙方签约人3',
-        principal: '朱家琨',
-        auditStatus: '审核中',
-        signerTime: '2019-03-07',
-        contractValidTime: '2020-03-07',
-        contractType: '纸质合同'
-      }],
+      tableData: [],
       showViewForm: {
         customerContractType: '',
         customerContractNum: '',
         contractEndTime: '',
-        contractScan: '',
+        contractScanList: [],
         partyA: {
           party: '',
           partyContactPerson: '',
@@ -169,27 +158,53 @@ export default {
       },
       total: 0,
       page: 1,
-      pageSize: 10
+      pageSize: 10,
+      customerContractTypes: [{
+        value: 1,
+        label: '商家与平台合同'
+      }, {
+        value: 2,
+        label: '商家与代理商合同'
+      }]
     }
   },
+  created () {
+    this.fetchData()
+  },
   methods: {
+    fetchData () {
+      let self = this
+      this.$axios.post('/api/contract/list', this.$qs.stringify(this.searchParam), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data.data
+          self.pageNum = _data.data.pageNum
+          self.pageSize = _data.data.pageSize
+          self.total = _data.data.totalSize
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
     handleShowView () {
       this.isShowViewVisible = true
     },
     handleAvatarSuccess (res, file) {
       this.imageUrl = URL.createObjectURL(file.raw)
     },
-    beforeAvatarUpload (file) {
-      const isJPG = file.type === 'image/jpeg'
-      const isLt2M = file.size / 1024 / 1024 < 2
-
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!')
-      }
-      return isJPG && isLt2M
+    handlePicCardPreview (file) {
+      this.isShowPicDialogVisible = true
     },
     handleSizeChange (val) {
       this.page = val
@@ -210,6 +225,9 @@ export default {
           this.tableList.push(list[from])
         }
       }
+    },
+    doFilter () {
+      this.fetchData()
     }
   }
 }
