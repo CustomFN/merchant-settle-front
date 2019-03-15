@@ -5,7 +5,7 @@
     <el-dropdown class="avatar-container" trigger="click">
       <div>
         <i class="el-icon-setting" style="margin-right: 10px"></i>
-        <span>王小虎</span>
+        <span>{{ userName }}</span>
       </div>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
         <router-link class="inlineBlock" to="/">
@@ -32,22 +32,27 @@ export default {
   },
   computed: {
   },
+  data () {
+    return {
+      userName: this.$store.state.userName
+    }
+  },
   methods: {
     logout () {
       // let self = this
-      // self.$axios.post('/api/logout', {
+      // this.$axios.post('/api/logout', {
       //   headers: {
+      //     'Access-Control-Allow-Origin': 'http://127.0.0.1',
       //     'Content-Type': 'application/x-www-form-urlencoded'
       //   }
       // }).then(function (response) {
       //   console.log(response.data)
       //   const _data = response.data
-      //   console.log(_data)
-      //   // if (200 == _data.code) {
-      //   //   self.$router.push('/')
-      //   // } else {
-      //   //   alert(_data.msg)
-      //   // }
+      //   if (_data.code === 200) {
+      //     self.$router.push('/')
+      //   } else {
+      //     alert(_data.msg)
+      //   }
       // }).catch(function (err) {
       //   if (err.response) {
       //     console.log(err.response)

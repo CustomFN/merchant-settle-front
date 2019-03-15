@@ -21,31 +21,30 @@
           :http-request="uploadAuthorPic"
           action="string"
           list-type="picture-card"
-          :on-preview="handleAuthorPicCardPreview"
+          :on-preview="handlePicCardPreview"
           :on-remove="handleAuthorPicRemove"
-          :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
+          :show-file-list="true"
+          :file-list="submitForm.kpAuthorizationPicList"
           multiple>
           <i class="el-icon-plus"></i>
         </el-upload>
-        <el-dialog :visible.sync="isShowAuthorPicDialogVisible">
-          <img width="100%" :src="submitForm.kpAuthorizationPicList" alt="">
-        </el-dialog>
       </el-form-item>
       <el-form-item label="证件图片">
         <el-upload class="avatar-uploader"
           :http-request="uploadCertiPic"
           action="string"
           list-type="picture-card"
-          :on-preview="handleCertiPicCardPreview"
+          :on-preview="handlePicCardPreview"
           :on-remove="handleCertiPicRemove"
-          :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
+          :show-file-list="true"
+          :file-list="submitForm.kpCertificatesPicList"
           multiple>
           <i class="el-icon-plus"></i>
         </el-upload>
-        <el-dialog :visible.sync="isShowCertiPicDialogVisible">
-          <img width="100%" :src="submitForm.kpCertificatesPicList" alt="">
+        <el-dialog :visible.sync="isShowPicDialogVisible">
+          <img width="100%" :src="dialogImageUrl" alt="">
         </el-dialog>
       </el-form-item>
       <el-form-item label="姓名">
@@ -80,11 +79,12 @@
 
 <script>
 export default {
-  name: '2',
+  name: 'customerKp',
   data () {
     return {
-      isShowAuthorPicDialogVisible: false,
-      isShowCertiPicDialogVisible: false,
+      isShowPicDialogVisible: false,
+      dialogImageUrl: '',
+      customerId: this.$store.state.customerId,
       submitForm: {
         kpType: 1,
         kpSiginType: 1,
@@ -96,7 +96,8 @@ export default {
         kpPhoneNum: '',
         bankId: '',
         bankNum: '',
-        statusStr: ''
+        statusStr: '',
+        customerId: this.$store.state.customerId
       },
       kpCertificatesTypes: [{
         value: 1,
@@ -110,6 +111,11 @@ export default {
         label: '签约人'
       }],
       editDisabled: false
+    }
+  },
+  mounted () {
+    if (this.customerId > 0) {
+      this.fetchData()
     }
   },
   methods: {
@@ -143,8 +149,55 @@ export default {
         console.log(error)
       })
     },
-    handleAvatarSuccess (res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw)
+    fetchData () {
+      let self = this
+      let targetUrl = '/api/customer/kp/show/' + this.customerId
+      console.log(targetUrl)
+      this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          if (_data.data != null) {
+            self.submitForm = _data.data
+
+            if (_data.data.kpAuthorizationPicList != null) {
+              let picList = _data.data.kpAuthorizationPicList
+              var list = []
+              for (let i = 0; i < picList.length; i++) {
+                list.push({name: 'name' + i, url: picList[i]})
+              }
+              self.submitForm.kpAuthorizationPicList = list
+            } else {
+              _data.data.kpAuthorizationPicList = []
+            }
+            if (_data.data.kpCertificatesPicList != null) {
+              let picList = _data.data.kpCertificatesPicList
+              let list = []
+              for (let i = 0; i < picList.length; i++) {
+                list.push({name: 'name' + i, url: picList[i]})
+              }
+              self.submitForm.kpCertificatesPicList = list
+            } else {
+              _data.data.kpCertificatesPicList = []
+            }
+            if (_data.data.status === 1) {
+              self.editDisabled = true
+            }
+          }
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
     },
     beforeAvatarUpload (file) {
       const isJPGPNG = file.type === 'image/jpeg' || file.type === 'image/png'
@@ -192,8 +245,9 @@ export default {
       let index = this.submitForm.kpCertificatesPicList.indexOf(fileUrl, 0)
       this.submitForm.kpCertificatesPicList.splice(index, 1)
     },
-    handleCertiPicCardPreview (file) {
-      this.isShowCertiPicDialogVisible = true
+    handlePicCardPreview (file) {
+      this.dialogImageUrl = file.url
+      this.isShowPicDialogVisible = true
     },
     uploadAuthorPic (param) {
       let self = this
@@ -228,9 +282,6 @@ export default {
       let fileUrl = file.url.slice(5, -1)
       let index = this.submitForm.kpAuthorizationPicList.indexOf(fileUrl, 0)
       this.submitForm.kpAuthorizationPicList.splice(index, 1)
-    },
-    handleAuthorPicCardPreview (file) {
-      this.isShowAuthorPicDialogVisible = true
     }
   }
 }

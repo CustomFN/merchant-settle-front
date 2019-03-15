@@ -11,8 +11,10 @@
         <el-table-column prop="settleAccNo" label="账号"  ></el-table-column>
         <el-table-column prop="settlePoiRelNum" label="关联门店数" ></el-table-column>
         <el-table-column label="操作" width="150">
-          <el-button type="text">修改</el-button>
-          <el-button type="text">删除</el-button>
+          <template slot-scope="scope">
+            <el-button type="text" @click="editSettle(scope.row)">修改</el-button>
+            <el-button type="text" @click="deleteSettle(scope.row)">删除</el-button>
+          </template>
         </el-table-column>
       </el-table>
     </div>
@@ -106,9 +108,10 @@
 
 <script>
 export default {
-  name: '4',
+  name: 'customerSettle',
   data () {
     return {
+      customerId: 0,
       tableData: [],
       total: 0,
       page: 1,
@@ -132,10 +135,11 @@ export default {
         settleCycle: 1,
         settleMinAmount: '',
         wmPoiIdList: [1],
-        statusStr: ''
+        statusStr: '',
+        customerId: this.$store.state.customerId
       },
       searchParam: {
-        customerId: 1,
+        customerId: 0,
         settleOrPoiId: '',
         effective: 0,
         pageNum: 1,
@@ -159,10 +163,14 @@ export default {
     }
   },
   mounted  () {
-    this.fetchData()
+    this.customerId = this.$store.state.customerId
+    if (this.customerId > 0) {
+      this.fetchData()
+    }
   },
   methods: {
     onSubmit () {
+      console.log(this.customerId)
       console.log(this.submitForm)
       let self = this
       this.$axios.post('/api/customer/settle/save', this.$qs.stringify(self.submitForm), {
@@ -194,6 +202,7 @@ export default {
     },
     fetchData () {
       let self = this
+      this.searchParam.customerId = this.$store.state.customerId
       this.$axios.post('/api/customer/settle/list', this.$qs.stringify(this.searchParam), {
         headers: {
           'Access-Control-Allow-Origin': 'http://127.0.0.1',
@@ -227,21 +236,40 @@ export default {
       console.log(this.page)
       this.fetchData()
     },
-    currentChangePage (list) {
-      let from = (this.page - 1) * this.pageSize
-      const to = this.page * this.pageSize
-      this.tableList = []
-      for (; from < to; from++) {
-        if (list[from]) {
-          this.tableList.push(list[from])
+    editSettle (row) {
+      let self = this
+      let targetUrl = '/api/customer/settle/show/' + row.id
+      console.log(targetUrl)
+      this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
         }
-      }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.submitForm = _data.data
+          if (_data.data.status === 1) {
+            self.editDisabled = true
+          }
+          self.isShowEditVisible = true
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
     },
     addSettle () {
+      this.submitForm = {}
       this.isShowEditVisible = true
     },
-    handleChange (value) {
-      console.log(value)
+    deleteSettle (row) {
+
     }
   }
 }
@@ -258,5 +286,8 @@ export default {
     margin-top: 10px;
     float: right;
   }
+}
+.core-tag {
+  text-align: right
 }
 </style>

@@ -347,7 +347,7 @@ export default {
         console.log(err.response)
       })
       this.deleteVisible = false
-      self.reload()
+      this.fetchData()
     },
     showRole (row) {
       this.fetchRoleData()

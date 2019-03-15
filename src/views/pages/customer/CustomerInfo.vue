@@ -2,16 +2,16 @@
   <div class="app-container">
     <div class="container-wrapper">
       <el-tabs v-model="activeName">
-        <el-tab-pane label="客户信息" name="1">
-          <customer-base-info :customerId="customerId"></customer-base-info>
+        <el-tab-pane label="客户信息" name='customerBaseInfo'>
+          <customer-base-info></customer-base-info>
         </el-tab-pane>
-        <el-tab-pane label="KP信息" name="2">
+        <el-tab-pane label="KP信息" name='customerKp'>
           <customer-kp></customer-kp>
         </el-tab-pane>
-        <el-tab-pane label="合同信息" name="3">
+        <el-tab-pane label="合同信息" name='customerContract'>
           <customer-contract></customer-contract>
         </el-tab-pane>
-        <el-tab-pane label="结算信息" name="4">
+        <el-tab-pane label="结算信息" name='customerSettle'>
           <customer-settle></customer-settle>
         </el-tab-pane>
       </el-tabs>
@@ -20,7 +20,6 @@
 </template>
 
 <script>
-import Bus from './bus.js'
 import { CustomerBaseInfo, CustomerKp, CustomerContract, CustomerSettle } from './components'
 export default {
   components: {
@@ -29,16 +28,12 @@ export default {
     CustomerContract,
     CustomerSettle
   },
-  mounted () {
-    let self = this
-    Bus.$on('customerId', (data) => {
-      console.log(data)
-    })
+  created () {
   },
   data () {
     return {
-      activeName: '1',
-      customerId: ''
+      activeName: 'customerBaseInfo',
+      customerId: 0
     }
   }
 }

@@ -37,9 +37,9 @@
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button type="text" @click="handleUpdate(scope.row)">编辑</el-button>
-              <el-button type="text" @click="deleteVisible = true">删除</el-button>
-              <el-button type="text" @click="showOpLog()">操作记录</el-button>
-              <el-button type="text" @click="isShowDistributionVisible = true">分配责任人</el-button>
+              <el-button type="text" @click="showDelete(scope.row)">删除</el-button>
+              <el-button type="text" @click="showOpLog(scope.row)">操作记录</el-button>
+              <el-button type="text" @click="showDistribution(scope.row)">分配责任人</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -58,14 +58,14 @@
     </el-card>
 
     <el-dialog title="分配责任人" :visible.sync="isShowDistributionVisible">
-      <el-form label-width="100px">
+      <el-form label-width="100px" :model="distributeParam">
         <el-form-item label="客户责任人">
-          <el-input v-model="customerPrincipal"></el-input>
+          <el-input v-model="distributeParam.customerPrincipal"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="isShowDistributionVisible = false">取消</el-button>
-        <el-button type="primary" class="title1">分配</el-button>
+        <el-button type="primary" @click="submitDistribution()">分配</el-button>
       </div>
     </el-dialog>
 
@@ -73,18 +73,18 @@
     <el-dialog
       title="删除"
       :visible.sync="deleteVisible"
+      :model="opParam"
       width="30%">
       <span>确认删除吗</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="deleteVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitDelete">确 定</el-button>
+        <el-button type="primary" @click="submitDelete(opParam.customerId)">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import Bus from './bus.js'
 export default {
   data () {
     return {
@@ -98,6 +98,13 @@ export default {
         pageNum: 1,
         pageSize: 10
       },
+      opParam: {
+        customerId: 0
+      },
+      distributeParam: {
+        customerId: 0,
+        customerPrincipal: ''
+      },
       tableData: [],
       total: 0,
       page: 1,
@@ -109,15 +116,76 @@ export default {
   },
   methods: {
     handleUpdate (row) {
-      this.transferValue(row.customerId)
+      this.$store.dispatch('setCustomerIdAction', row.customerId)
       this.$router.push('/customer/customerinfo')
     },
     createCustomer () {
+      this.$store.dispatch('setCustomerIdAction', 0)
       this.$router.push('/customer/customerinfo')
     },
-    submitDelete () {
+    showDelete (row) {
+      this.deleteVisible = true
+      this.opParam.customerId = row.customerId
     },
-    showOpLog () {
+    submitDelete (customerId) {
+      let self = this
+      let api = '/api/customer/delete/' + customerId
+      this.$axios.post(api, {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (err) {
+        console.log(err.response)
+      })
+      this.deleteVisible = false
+    },
+    showDistribution (row) {
+      this.isShowDistributionVisible = true
+      this.distributeParam.customerId = row.customerId
+    },
+    submitDistribution () {
+      console.log(this.distributeParam)
+      let self = this
+      this.$axios.post('/api/customer/distributePrincipal', this.$qs.stringify(self.distributeParam), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$message({
+            message: '分配责任人成功',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.isShowDistributionVisible = false
+    },
+    showOpLog (row) {
+      this.$store.dispatch('setCustomerIdAction', row.customerId)
       this.$router.push('/customer/customeroplog')
     },
     fetchData () {
@@ -158,9 +226,6 @@ export default {
       this.searchParam.pageNum = val
       console.log(this.page)
       this.fetchData()
-    },
-    transferValue (customerId) {
-      Bus.$emit('customerId', customerId)
     }
   }
 }

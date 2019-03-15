@@ -4,7 +4,7 @@
       <div>
         <el-form :inline="true">
           <el-form-item >
-            <el-input placeholder="客户ID" v-model="searchParam.customerId"></el-input>
+            <el-input placeholder="客户ID" v-model="searchParam.customerId" disabled></el-input>
           </el-form-item>
           <el-form-item >
             <el-input placeholder="模块" v-model="searchParam.module"></el-input>
@@ -25,11 +25,18 @@
       <div>
         <el-table :data="tableData" border style="width: 100%">
           <el-table-column prop="id" label="ID" width="120"></el-table-column>
-          <el-table-column prop="customerId" label="客户ID" width="120"></el-table-column>
-          <el-table-column prop="module" label="模块" width="150"></el-table-column>
+          <el-table-column prop="module" label="模块" width="100"></el-table-column>
           <el-table-column prop="content" label="内容"></el-table-column>
-          <el-table-column prop="opUser" label="操作人" width="150"></el-table-column>
-          <el-table-column prop="ctime" label="操作时间" width="200"></el-table-column>
+          <el-table-column label="操作人" width="150">
+            <template slot-scope="scope">
+              <p> {{ scope.row.opUser }}({{ scope.row.opUserId }})</p>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作时间" width="200">
+            <template slot-scope="scope">
+              <p>{{ scope.row.ctime | dateformat('YYYY-DD-MM HH:mm:ss') }}</p>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
       <div class="pagination">
@@ -55,55 +62,56 @@ export default {
         customerId: '',
         module: '',
         content: '',
-        opUser: ''
+        opUserId: '',
+        pageNum: 1,
+        pageSize: 10
       },
-      tableData: [{
-        id: 1,
-        customerId: 1,
-        module: '客户基本信息',
-        content: '新建客户',
-        opUser: '朱家琨',
-        ctime: '2019-03-07 12:12:12'
-      }, {
-        id: 2,
-        customerId: 1,
-        module: '客户KP信息',
-        content: '新建KP',
-        opUser: '朱家琨',
-        ctime: '2019-03-07 12:13:12'
-      }, {
-        id: 3,
-        customerId: 1,
-        module: '客户合同信息',
-        content: '新建合同',
-        opUser: '朱家琨',
-        ctime: '2019-03-07 12:14:13'
-      }],
+      tableData: [],
       total: 0,
       page: 1,
       pageSize: 10
     }
   },
+  mounted () {
+    this.searchParam.customerId = this.$store.state.customerId
+    this.fetchData()
+  },
   methods: {
+    fetchData () {
+      console.log(this.searchParam)
+      let self = this
+      this.$axios.post('/api/customer/log/list', this.$qs.stringify(self.searchParam), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data.data
+          self.page = _data.data.pageNum
+          self.pageSize = _data.data.pageSize
+          self.total = _data.data.totalSize
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
     handleSizeChange (val) {
-      this.page = val
+      this.searchParam.pageNum = val
       console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
-      this.page = val
+      this.searchParam.pageNum = val
       console.log(this.page)
       this.fetchData()
-    },
-    currentChangePage (list) {
-      let from = (this.page - 1) * this.pageSize
-      const to = this.page * this.pageSize
-      this.tableList = []
-      for (; from < to; from++) {
-        if (list[from]) {
-          this.tableList.push(list[from])
-        }
-      }
     }
   }
 }

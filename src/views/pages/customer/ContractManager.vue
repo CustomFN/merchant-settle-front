@@ -35,7 +35,7 @@
           <el-table-column prop="signerTime" label="签约时间" width="120">
             <template slot-scope="scope">
               <p>{{ scope.row.signerTime | dateformat }}</p>
-            </template>  
+            </template>
           </el-table-column>
           <el-table-column label="合同有效期" width="120">
             <template slot-scope="scope">
@@ -48,7 +48,9 @@
             </template>
           </el-table-column>
           <el-table-column label="操作">
-            <el-button type="text" @click="handleShowView()">查看</el-button>
+            <template slot-scope="scope">
+              <el-button type="text" @click="handleShowView(scope.row)">查看</el-button>
+            </template>
           </el-table-column>
         </el-table>
       </div>
@@ -70,8 +72,7 @@
         <el-form label-width="150px"  :model="showViewForm" size="medium">
           <el-form-item label="合同类型">
             <el-select v-model="showViewForm.customerContractType">
-              <el-option label="商家与平台合同" value="1"></el-option>
-              <el-option label="商家与代理商合同" value="2"></el-option>
+            <el-option v-for="item in customerContractTypes" :key="item.value" :label="item.label" :value="item.value"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="合同编号">
@@ -110,11 +111,14 @@
             <el-upload class="avatar-uploader"
               list-type="picture-card"
               :on-preview="handlePicCardPreview"
+              :show-file-list="true"
+              action=""
+              :file-list="showViewForm.contractScanList"
               multiple>
               <i class="el-icon-plus"></i>
             </el-upload>
             <el-dialog :visible.sync="isShowPicDialogVisible">
-              <img width="100%" :src="showViewForm.contractScanList" alt="">
+              <img width="100%" :src="dialogImageUrl" alt="">
             </el-dialog>
           </el-form-item>
         </el-form>
@@ -130,6 +134,7 @@
 export default {
   data () {
     return {
+      dialogImageUrl: '',
       isShowPicDialogVisible: false,
       isShowViewVisible: false,
       searchParam: {
@@ -156,16 +161,16 @@ export default {
           signTime: ''
         }
       },
-      total: 0,
-      page: 1,
-      pageSize: 10,
       customerContractTypes: [{
         value: 1,
         label: '商家与平台合同'
       }, {
         value: 2,
         label: '商家与代理商合同'
-      }]
+      }],
+      total: 0,
+      page: 1,
+      pageSize: 10
     }
   },
   created () {
@@ -197,13 +202,47 @@ export default {
         console.log(error)
       })
     },
-    handleShowView () {
+    handleShowView (row) {
+      let self = this
+      let targetUrl = '/api/customer/contract/show/' + row.contractId
+      this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.showViewForm = _data.data
+
+          if (_data.data.contractScanList != null) {
+            let picList = _data.data.contractScanList
+            var list = []
+            for (let i = 0; i < picList.length; i++) {
+              list.push({name: 'name' + i, url: picList[i]})
+            }
+            self.showViewForm.contractScanList = list
+          } else {
+            self.showViewForm.contractScanList = []
+          }
+
+          if (_data.data.status === 1) {
+            self.editDisabled = true
+          }
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
       this.isShowViewVisible = true
     },
-    handleAvatarSuccess (res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw)
-    },
     handlePicCardPreview (file) {
+      this.dialogImageUrl = file.url
       this.isShowPicDialogVisible = true
     },
     handleSizeChange (val) {
@@ -215,16 +254,6 @@ export default {
       this.page = val
       console.log(this.page)
       this.fetchData()
-    },
-    currentChangePage (list) {
-      let from = (this.page - 1) * this.pageSize
-      const to = this.page * this.pageSize
-      this.tableList = []
-      for (; from < to; from++) {
-        if (list[from]) {
-          this.tableList.push(list[from])
-        }
-      }
     },
     doFilter () {
       this.fetchData()

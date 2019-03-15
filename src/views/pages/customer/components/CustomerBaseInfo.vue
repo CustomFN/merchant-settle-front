@@ -19,13 +19,14 @@
           list-type="picture-card"
           :on-preview="handlePicCardPreview"
           :on-remove="handlePicRemove"
-          :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
+          :show-file-list="true"
+          :file-list="submitForm.customerCertificatesPicList"
           multiple>
           <i class="el-icon-plus"></i>
         </el-upload>
         <el-dialog :visible.sync="isShowPicDialogVisible">
-          <img width="100%" :src="submitForm.customerCertificatesPicList" alt="">
+          <img width="100%" :src="dialogImageUrl" alt="">
         </el-dialog>
       </el-form-item>
       <el-form-item label="客户证件编号">
@@ -54,13 +55,12 @@
 
 <script>
 export default {
-  name: '1',
-  props: {
-    customerId: Number
-  },
+  name: 'customerBaseInfo',
   data () {
     return {
       isShowPicDialogVisible: false,
+      dialogImageUrl: '',
+      customerId: this.$store.state.customerId,
       submitForm: {
         id: '',
         customerType: '',
@@ -82,7 +82,10 @@ export default {
       editDisabled: false
     }
   },
-  created () {
+  mounted () {
+    if (this.customerId > 0) {
+      this.fetchData()
+    }
   },
   methods: {
     onSubmit () {
@@ -122,7 +125,7 @@ export default {
     },
     fetchData () {
       let self = this
-      let targetUrl = '/api/customer/show/' + this.submitForm.id
+      let targetUrl = '/api/customer/show/' + this.customerId
       console.log(targetUrl)
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
@@ -134,6 +137,17 @@ export default {
         const _data = response.data
         if (_data.code === 200) {
           self.submitForm = _data.data
+          if (_data.data.customerCertificatesPicList != null) {
+            let picList = _data.data.customerCertificatesPicList
+            var list = []
+            for (let i = 0; i < picList.length; i++) {
+              list.push({name: 'name' + i, url: picList[i]})
+            }
+            self.submitForm.customerCertificatesPicList = list
+          } else {
+            self.submitForm.customerCertificatesPicList = []
+          }
+
           if (_data.data.status === 1) {
             self.editDisabled = true
           }
@@ -146,9 +160,6 @@ export default {
       }).catch(function (error) {
         console.log(error)
       })
-    },
-    handleAvatarSuccess (res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw)
     },
     uploadPic (param) {
       let self = this
@@ -197,6 +208,7 @@ export default {
       this.submitForm.customerCertificatesPicList.splice(index, 1)
     },
     handlePicCardPreview (file) {
+      this.dialogImageUrl = file.url
       this.isShowPicDialogVisible = true
     }
   }

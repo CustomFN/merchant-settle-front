@@ -27,7 +27,9 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150">
-          <el-button type="text">修改合同</el-button>
+          <template slot-scope="scope">
+            <el-button type="text" @click="editContract(scope.row)">修改合同</el-button>
+          </template>
         </el-table-column>
       </el-table>
     </div>
@@ -44,10 +46,13 @@
     </div>
 
     <el-dialog title="合同信息" :visible.sync="isShowEditVisible">
+      <div class="core-tag">
+        <el-tag v-if="submitForm.statusStr" type="success">{{ submitForm.statusStr }}</el-tag>
+      </div>
       <el-form label-width="150px"  :model="submitForm" size="medium">
         <el-form-item label="合同类型">
           <el-select v-model="submitForm.customerContractType" v-bind:disabled="editDisabled">
-          <el-option v-for="item in customerContractTypes" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            <el-option v-for="item in customerContractTypes" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="合同编号">
@@ -89,13 +94,14 @@
             list-type="picture-card"
             :on-preview="handlePicCardPreview"
             :on-remove="handlePicRemove"
-            :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
+            :show-file-list="true"
+            :file-list="submitForm.contractScanList"
             multiple>
             <i class="el-icon-plus"></i>
           </el-upload>
           <el-dialog :visible.sync="isShowPicDialogVisible">
-            <img width="100%" :src="submitForm.contractScanList" alt="">
+            <img width="100%" :src="dialogImageUrl" alt="">
           </el-dialog>
         </el-form-item>
       </el-form>
@@ -109,10 +115,12 @@
 
 <script>
 export default {
-  name: '3',
+  name: 'customerContract',
   data () {
     return {
+      customerId: this.$store.state.customerId,
       isShowPicDialogVisible: false,
+      dialogImageUrl: '',
       tableData: [],
       total: 0,
       page: 1,
@@ -123,6 +131,7 @@ export default {
         customerContractNum: '',
         contractEndTime: '',
         contractScanList: [],
+        customerId: this.$store.state.customerId,
         partyA: {
           signerLabel: 'A',
           party: '朱家琨',
@@ -149,9 +158,51 @@ export default {
     }
   },
   mounted  () {
-    this.fetchData()
+    if (this.customerId > 0) {
+      this.fetchData()
+    }
   },
   methods: {
+    editContract (row) {
+      let self = this
+      let targetUrl = '/api/customer/contract/show/' + row.contractId
+      console.log(targetUrl)
+      this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.submitForm = _data.data
+
+          if (_data.data.contractScanList != null) {
+            let picList = _data.data.contractScanList
+            var list = []
+            for (let i = 0; i < picList.length; i++) {
+              list.push({name: 'name' + i, url: picList[i]})
+            }
+            self.submitForm.contractScanList = list
+          } else {
+            self.submitForm.contractScanList = []
+          }
+
+          if (_data.data.status === 1) {
+            self.editDisabled = true
+          }
+          self.isShowEditVisible = true
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
     onSubmit () {
       let endTime = this.submitForm.contractEndTime
       let partyASignerTime = this.submitForm.partyA.signTime
@@ -198,7 +249,8 @@ export default {
     },
     fetchData () {
       let self = this
-      this.$axios.post('/api/customer/contract/list', this.$qs.stringify({'customerId': 1}), {
+      let customerId = this.customerId
+      this.$axios.post('/api/customer/contract/list', this.$qs.stringify({'customerId': customerId}), {
         headers: {
           'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -220,9 +272,6 @@ export default {
       }).catch(function (error) {
         console.log(error)
       })
-    },
-    handleAvatarSuccess (res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw)
     },
     uploadPic (param) {
       let self = this
@@ -271,6 +320,7 @@ export default {
       this.submitForm.contractScanList.splice(index, 1)
     },
     handlePicCardPreview (file) {
+      this.dialogImageUrl = file.url
       this.isShowPicDialogVisible = true
     },
     handleSizeChange (val) {
@@ -294,6 +344,7 @@ export default {
       }
     },
     addPaperContract () {
+      this.submitForm = {}
       this.isShowEditVisible = true
     }
   }
@@ -334,5 +385,8 @@ export default {
   width: 178px;
   height: 178px;
   display: block;
+}
+.core-tag {
+  text-align: right
 }
 </style>
