@@ -32,9 +32,13 @@ export default {
   },
   computed: {
   },
+  mounted () {
+    let user = this.$cookies.get('user')
+    this.userName = user.userName
+  },
   data () {
     return {
-      userName: this.$store.state.userName
+      userName: ''
     }
   },
   methods: {

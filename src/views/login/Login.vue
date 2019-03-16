@@ -79,8 +79,7 @@ export default {
         console.log(response.data)
         const _data = response.data
         if (_data.code === 200) {
-          let userName = _data.data.userName
-          self.$store.dispatch('setUserAction', userName)
+          self.$cookies.set('user', _data.data)
           self.$router.push('/')
         } else {
           alert(_data.msg)

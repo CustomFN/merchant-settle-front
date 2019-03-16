@@ -5,6 +5,7 @@ import Vuex from 'vuex'
 import App from './App'
 import router from './router'
 
+import VueCookies from 'vue-cookies'
 import Axios from 'axios'
 import qs from 'qs'
 import AMap from 'vue-amap'
@@ -17,6 +18,7 @@ import '@/assets/iconfont/iconfont.css'
 import '@/styles/index.scss' // global css
 
 Vue.use(Vuex)
+Vue.use(VueCookies)
 Vue.use(ElementUI)
 Vue.use(AMap)
 Vue.prototype.$moment = moment
@@ -40,7 +42,6 @@ Vue.filter('dateformat', function (datatime, pattern = 'YYYY-MM-DD') {
 
 const store = new Vuex.Store({
   state: {
-    userName: '',
     customerId: 0,
     contractId: 0
   },
@@ -50,9 +51,6 @@ const store = new Vuex.Store({
     },
     setContractId (state, val) {
       state.contractId = val
-    },
-    setUser (state, val) {
-      state.userName = val
     }
   },
   actions: {
@@ -61,9 +59,6 @@ const store = new Vuex.Store({
     },
     setContractIdAction (context, val) {
       context.commit('setContractId', val)
-    },
-    setUserAction (context, val) {
-      context.commit('setUser', val)
     }
   }
 })
