@@ -31,6 +31,7 @@
     </div>
 
     <el-dialog title="结算信息" :visible.sync="isShowEditVisible">
+      <el-alert type="error" v-if="submitForm.auditResult">{{ submitForm.auditResult }}</el-alert>
       <div class="core-tag">
         <el-tag v-if="submitForm.statusStr" type="success">{{ submitForm.statusStr }}</el-tag>
       </div>
@@ -117,6 +118,7 @@ export default {
       page: 1,
       pageSize: 10,
       isShowEditVisible: false,
+      tempForm: {},
       submitForm: {
         settleAccType: 1,
         settleAccName: '',
@@ -163,6 +165,7 @@ export default {
     }
   },
   mounted  () {
+    this.tempForm = this.submitForm
     this.customerId = this.$store.state.customerId
     if (this.customerId > 0) {
       this.fetchData()
@@ -265,7 +268,7 @@ export default {
       })
     },
     addSettle () {
-      this.submitForm = {}
+      this.submitForm = this.tempForm
       this.isShowEditVisible = true
     },
     deleteSettle (row) {

@@ -46,6 +46,7 @@
     </div>
 
     <el-dialog title="合同信息" :visible.sync="isShowEditVisible">
+      <el-alert type="error" v-if="submitForm.auditResult">{{ submitForm.auditResult }}</el-alert>
       <div class="core-tag">
         <el-tag v-if="submitForm.statusStr" type="success">{{ submitForm.statusStr }}</el-tag>
       </div>
@@ -73,7 +74,7 @@
           <el-input v-model="submitForm.partyA.partyContactPersonPhone" v-bind:disabled="editDisabled"></el-input>
         </el-form-item>
         <el-form-item label="甲方签约时间">
-          <el-input v-model="submitForm.partyA.signTime" v-bind:disabled="editDisabled"></el-input>
+          <el-input :value="submitForm.partyA.signTime | dateformat" v-bind:disabled="editDisabled"></el-input>
         </el-form-item>
         <el-form-item label="乙方">
           <el-input v-model="submitForm.partyB.party" disabled></el-input>
@@ -85,7 +86,7 @@
           <el-input v-model="submitForm.partyB.partyContactPersonPhone" v-bind:disabled="editDisabled"></el-input>
         </el-form-item>
         <el-form-item label="乙方签约时间">
-          <el-input v-model="submitForm.partyB.signTime" v-bind:disabled="editDisabled"></el-input>
+          <el-input :value="submitForm.partyB.signTime | dateformat" v-bind:disabled="editDisabled"></el-input>
         </el-form-item>
         <el-form-item label="合同扫描件">
           <el-upload class="avatar-uploader"
@@ -126,6 +127,7 @@ export default {
       page: 1,
       pageSize: 10,
       isShowEditVisible: false,
+      tempForm: {},
       submitForm: {
         customerContractType: '',
         customerContractNum: '',
@@ -158,6 +160,7 @@ export default {
     }
   },
   mounted  () {
+    this.tempForm = this.submitForm
     if (this.customerId > 0) {
       this.fetchData()
     }
@@ -177,6 +180,7 @@ export default {
         const _data = response.data
         if (_data.code === 200) {
           self.submitForm = _data.data
+          self.submitForm.contractEndTime = self.submitForm.contractEndTime * 1000
 
           if (_data.data.contractScanList != null) {
             let picList = _data.data.contractScanList
@@ -344,7 +348,7 @@ export default {
       }
     },
     addPaperContract () {
-      this.submitForm = {}
+      this.submitForm = this.tempForm
       this.isShowEditVisible = true
     }
   }

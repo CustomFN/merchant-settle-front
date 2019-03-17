@@ -42,15 +42,27 @@ Vue.filter('dateformat', function (datatime, pattern = 'YYYY-MM-DD') {
 
 const store = new Vuex.Store({
   state: {
-    customerId: 0,
-    contractId: 0
+    customerId: localStorage.getItem('customerId') || 0,
+    contractId: localStorage.getItem('contractId') || 0,
+    wmPoiId: localStorage.getItem('wmPoiId') || 0,
+    auditTaskId: localStorage.getItem('auditTaskId') || 0
   },
   mutations: {
     setCustomerId (state, val) {
+      localStorage.setItem('customerId', val)
       state.customerId = val
     },
     setContractId (state, val) {
+      localStorage.setItem('contractId', val)
       state.contractId = val
+    },
+    setWmPoiId (state, val) {
+      localStorage.setItem('wmPoiId', val)
+      state.wmPoiId = val
+    },
+    setAuditTaskId (state, val) {
+      localStorage.setItem('auditTaskId', val)
+      state.auditTaskId = val
     }
   },
   actions: {
@@ -59,6 +71,12 @@ const store = new Vuex.Store({
     },
     setContractIdAction (context, val) {
       context.commit('setContractId', val)
+    },
+    setWmPoiIdAction (context, val) {
+      context.commit('setWmPoiId', val)
+    },
+    setAuditTaskIdAction (context, val) {
+      context.commit('setAuditTaskId', val)
     }
   }
 })

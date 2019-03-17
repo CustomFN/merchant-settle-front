@@ -62,6 +62,7 @@ export default {
       //     console.log(err.response)
       //   }
       // })
+      this.$cookies.remove('user')
       this.$router.push('/login')
     }
   }

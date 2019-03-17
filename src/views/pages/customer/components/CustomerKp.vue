@@ -1,4 +1,6 @@
 <template>
+<div>
+  <el-alert type="error" v-if="submitForm.auditResult">{{ submitForm.auditResult }}</el-alert>
   <div class="container-core">
     <div class="core-tag">
       <el-tag v-if="submitForm.statusStr" type="success">{{ submitForm.statusStr }}</el-tag>
@@ -75,6 +77,7 @@
       </el-form-item>
     </el-form>
   </div>
+</div>
 </template>
 
 <script>

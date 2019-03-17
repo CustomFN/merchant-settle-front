@@ -19,29 +19,41 @@
         </el-col>
       </div>
       <div class="container-footer">
-        <el-tabs type="border-card">
-          <el-tab-pane label="待分配">
+        <el-tabs type="border-card" v-model="activeName"  @tab-click="getTabData">
+          <el-tab-pane label="待分配" name="1">
             <el-table :data="tableData" style="width: 100%">
-              <el-table-column prop="taskId" label="任务ID" width="150"></el-table-column>
-              <el-table-column prop="auditType" label="审核类型" width="200"></el-table-column>
-              <el-table-column prop="applicationType" label="申请类型" width="200"></el-table-column>
-              <el-table-column prop="applicationTime" label="申请时间" width="250"></el-table-column>
-              <el-table-column prop="commitor" label="提交人" width="200"></el-table-column>
+              <el-table-column prop="id" label="任务ID" width="150"></el-table-column>
+              <el-table-column prop="auditTypeStr" label="审核类型" width="200"></el-table-column>
+              <el-table-column prop="auditApplicationTypeStr" label="申请类型" width="200"></el-table-column>
+              <el-table-column label="申请时间" width="250">
+                <template slot-scope="scope">
+                  <p>{{ scope.row.ctime | dateformat('YYYY-DD-MM HH:mm:ss') }}</p>
+                </template>
+              </el-table-column>
+              <el-table-column prop="submitterId" label="提交人" width="200"></el-table-column>
               <el-table-column label="操作">
-                <el-button type="text" @click="handleAudit()">处理</el-button>
-                <el-button type="text" @click="handleView()">查看</el-button>
+                <template slot-scope="scope">
+                  <el-button type="text" @click="handleAudit(scope.row)">处理</el-button>
+                  <el-button type="text" @click="handleView(scope.row)">查看</el-button>
+                </template>
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <el-tab-pane label="已完成">
+          <el-tab-pane label="已完成" name="2">
             <el-table :data="tableData" style="width: 100%">
-              <el-table-column prop="taskId" label="任务ID" width="150"></el-table-column>
-              <el-table-column prop="auditType" label="审核类型" width="200"></el-table-column>
-              <el-table-column prop="applicationType" label="申请类型" width="200"></el-table-column>
-              <el-table-column prop="applicationTime" label="申请时间" width="250"></el-table-column>
+              <el-table-column prop="id" label="任务ID" width="150"></el-table-column>
+              <el-table-column prop="auditTypeStr" label="审核类型" width="200"></el-table-column>
+              <el-table-column prop="auditApplicationTypeStr" label="申请类型" width="200"></el-table-column>
+              <el-table-column label="申请时间" width="250">
+                <template slot-scope="scope">
+                  <p>{{ scope.row.ctime | dateformat('YYYY-DD-MM HH:mm:ss') }}</p>
+                </template>
+              </el-table-column>
               <el-table-column prop="commitor" label="提交人" width="200"></el-table-column>
               <el-table-column label="操作">
-                <el-button type="text" @click="handleView()">查看</el-button>
+                <template slot-scope="scope">
+                  <el-button type="text" @click="handleView(scope.row)">查看</el-button>
+                </template>
               </el-table-column>
             </el-table>
           </el-tab-pane>
@@ -69,64 +81,85 @@ export default {
       searchParam: {
         customerId: '',
         poiId: '',
-        submitterId: ''
+        submitterId: '',
+        transactor: '',
+        completed: 0,
+        pageNum: 1,
+        pageSize: 10
       },
-      tableData: [{
-        taskId: '1',
-        auditType: '基本信息审核',
-        applicationType: '新建',
-        applicationTime: '2016-05-02',
-        commitor: '朱家琨'
-      }, {
-        taskId: '2',
-        auditType: '基本信息审核',
-        applicationType: '新建',
-        applicationTime: '2016-05-02',
-        commitor: '朱家琨'
-      }, {
-        taskId: '3',
-        auditType: '基本信息审核',
-        applicationType: '新建',
-        applicationTime: '2016-05-02',
-        commitor: '朱家琨'
-      }, {
-        taskId: '4',
-        auditType: '基本信息审核',
-        applicationType: '新建',
-        applicationTime: '2016-05-02',
-        commitor: '朱家琨'
-      }],
+      tableData: [],
       total: 0,
       page: 1,
-      pageSize: 10
+      pageSize: 10,
+      activeName: '1',
+      isTab1: true,
+      isTab2: false
     }
   },
+  mounted () {
+    let user = this.$cookies.get('user')
+    this.searchParam.transactor = user.userId
+    this.fetchData()
+  },
   methods: {
+    fetchData () {
+      console.log(this.searchParam)
+      let self = this
+      this.$axios.post('/api/audit/list', this.$qs.stringify(self.searchParam), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data.data
+          self.page = _data.data.pageNum
+          self.pageSize = _data.data.pageSize
+          self.total = _data.data.totalSize
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
     handleAudit () {
       this.$router.push('/audit/auditwmpoibaseinfo')
     },
     handleView () {
       this.$router.push('/audit/auditcustomer')
     },
+    getTabData (tab) {
+      let self = this
+      if (tab.name === '1') {
+        self.isTab1 = true
+        self.isTab2 = false
+        self.searchParam.completed = 0
+        self.fetchData()
+      } else if (tab.name === '2') {
+        self.isTab1 = false
+        self.isTab2 = true
+        self.searchParam.completed = 1
+        self.fetchData()
+      }
+    },
+    doFilter () {
+      this.fetchData()
+    },
     handleSizeChange (val) {
-      this.page = val
+      this.searchParam.pageNum = val
       console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
-      this.page = val
+      this.searchParam.pageNum = val
       console.log(this.page)
       this.fetchData()
-    },
-    currentChangePage (list) {
-      let from = (this.page - 1) * this.pageSize
-      const to = this.page * this.pageSize
-      this.tableList = []
-      for (; from < to; from++) {
-        if (list[from]) {
-          this.tableList.push(list[from])
-        }
-      }
     }
   }
 }
