@@ -20,26 +20,26 @@
               <el-table-column prop="customerId" label="客户ID" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 361px">
-              <el-table-column prop="kpType" label="KP类型" width="120px"></el-table-column>
-              <el-table-column prop="kpSiginType" label="KP签约类型" width="120px"></el-table-column>
-              <el-table-column prop="kpName" label="KP姓名" width="120px"></el-table-column>
+              <el-table-column prop="auditDataObj.kpType" label="KP类型" width="120px"></el-table-column>
+              <el-table-column prop="auditDataObj.kpSiginType" label="KP签约类型" width="120px"></el-table-column>
+              <el-table-column prop="auditDataObj.kpName" label="KP姓名" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="kpCertificatesType" label="证件类型" width="240"></el-table-column>
-              <el-table-column prop="kpCertificatesNum" label="证件号码"></el-table-column>
-              <el-table-column prop="kpPhoneNum" label="手机号"></el-table-column>
+              <el-table-column prop="auditDataObj.kpCertificatesType" label="证件类型" width="200"></el-table-column>
+              <el-table-column prop="auditDataObj.kpCertificatesNum" label="证件号码"></el-table-column>
+              <el-table-column prop="auditDataObj.kpPhoneNum" label="手机号" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="bankName" label="银行"></el-table-column>
-              <el-table-column prop="bankNum" label="银行卡号"></el-table-column>
+              <el-table-column prop="auditDataObj.bankName" label="银行"></el-table-column>
+              <el-table-column prop="auditDataObj.bankNum" label="银行卡号"></el-table-column>
             </el-table>
             <div class="container-right-bottom">
               <div>
-                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="textarea"></el-input>
+                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="auditResult.result"></el-input>
               </div>
               <div class="container-right-bottom-btn">
-                <el-button type="primary">审核通过</el-button>
-                <el-button type="danger">审核驳回</el-button>
+                <el-button type="primary" @click="submitAuditPass()">审核通过</el-button>
+                <el-button type="danger" @click="submitAuditReject()">审核驳回</el-button>
               </div>
             </div>
           </div>
@@ -53,21 +53,108 @@
 export default {
   data () {
     return {
-      image_1: 'http://pniquhm38.bkt.clouddn.com/2ec37620-7b8b-4d01-b180-df72753c78ba',
-      image_2: 'http://pniquhm38.bkt.clouddn.com/2ec37620-7b8b-4d01-b180-df72753c78ba',
-      image_3: 'http://pniquhm38.bkt.clouddn.com/2ec37620-7b8b-4d01-b180-df72753c78ba',
-      textarea: '',
-      tableData: [{
-        customerId: '1',
-        kpType: '签约人',
-        kpSiginType: '法人代表',
-        kpName: '朱家琨',
-        kpCertificatesType: '中国居民身份证',
-        kpCertificatesNum: '1234567890000',
-        kpPhoneNum: '123456789',
-        bankName: '北京市-朝阳区-中国建设银行',
-        bankNum: '6666666666666666'
-      }]
+      image_1: '',
+      image_2: '',
+      image_3: '',
+      tableData: [],
+      auditResult: {
+        auditTaskId: 0,
+        auditStatus: 203,
+        result: '',
+        opUser: ''
+      }
+    }
+  },
+  mounted () {
+    this.taskId = this.auditResult.auditTaskId = this.$store.state.auditTaskId
+    this.opUser = this.$store.state.userId
+    this.fetchData()
+  },
+  methods: {
+    fetchData () {
+      let self = this
+      let targetUrl = '/api/audit/detail/' + this.taskId
+      console.log(targetUrl)
+      this.$axios.post(targetUrl, {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    submitAuditPass () {
+      let self = this
+      this.auditResult.auditStatus = this.$store.state.auditPassStatus
+      this.$axios.post('/api/audit/saveAuditResult', this.$qs.stringify(self.auditResult), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$message({
+            message: '审核通过',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.$router.push('/audit/AuditTaskHandle')
+    },
+    submitAuditReject () {
+      let self = this
+      if (this.auditResult.result === '') {
+        self.$message({
+          message: '驳回原因必填',
+          type: 'warning'
+        })
+      } else {
+        self.auditResult.auditStatus = self.$store.state.auditRejectStatus
+        self.$axios.post('/api/audit/saveAuditResult', self.$qs.stringify(self.auditResult), {
+          headers: {
+            'Access-Control-Allow-Origin': 'http://127.0.0.1',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then(function (response) {
+          console.log(response)
+          const _data = response.data
+          if (_data.code === 200) {
+            self.$message({
+              message: '审核驳回',
+              type: 'warning'
+            })
+          } else {
+            self.$message({
+              message: _data.msg,
+              type: 'warning'
+            })
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
+        this.$router.push('/audit/AuditTaskHandle')
+      }   
     }
   }
 }
@@ -85,5 +172,4 @@ export default {
 .container-right-bottom, .container-right-bottom-btn {
   margin-top: 10px
 }
-
 </style>

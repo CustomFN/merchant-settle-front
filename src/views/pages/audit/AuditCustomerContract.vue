@@ -18,32 +18,32 @@
           <div class="">
             <el-table :data="tableData" border style="width:241px">
               <el-table-column prop="customerId" label="客户ID" width="120px"></el-table-column>
-              <el-table-column prop="contractId" label="合同ID" width="120px"></el-table-column>
+              <el-table-column prop="auditDataObj.contractId" label="合同ID" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="customerContractType" label="合同类型" width="180px"></el-table-column>
-              <el-table-column prop="customerContractNum" label="合同编号"></el-table-column>
-              <el-table-column prop="contractEndTime" label="合同有效期" width="180px"></el-table-column>
+              <el-table-column prop="auditDataObj.customerContractType" label="合同类型" width="180px"></el-table-column>
+              <el-table-column prop="auditDataObj.customerContractNum" label="合同编号"></el-table-column>
+              <el-table-column prop="auditDataObj.contractEndTime" label="合同有效期" width="180px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="partyA" label="甲方"></el-table-column>
-              <el-table-column prop="partyAContactPerson" label="甲方签约人" width="120"></el-table-column>
-              <el-table-column prop="partyAContactPersonPhone" label="甲方签约人手机号" width="180"></el-table-column>
-              <el-table-column prop="partyASignTime" label="甲方签约时间" width="120"></el-table-column>
+              <el-table-column prop="auditDataObj.partyA" label="甲方"></el-table-column>
+              <el-table-column prop="auditDataObj.partyAContactPerson" label="甲方签约人" width="120"></el-table-column>
+              <el-table-column prop="auditDataObj.partyAContactPersonPhone" label="甲方签约人手机号" width="180"></el-table-column>
+              <el-table-column prop="auditDataObj.partyASignTime" label="甲方签约时间" width="120"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="partyB" label="乙方"></el-table-column>
-              <el-table-column prop="partyBContactPerson" label="乙方签约人" width="120"></el-table-column>
-              <el-table-column prop="partyBContactPersonPhone" label="乙方签约人手机号" width="180"></el-table-column>
-              <el-table-column prop="partyBSignTime" label="乙方签约时间" width="120"></el-table-column>
+              <el-table-column prop="auditDataObj.partyB" label="乙方"></el-table-column>
+              <el-table-column prop="auditDataObj.partyBContactPerson" label="乙方签约人" width="120"></el-table-column>
+              <el-table-column prop="auditDataObj.partyBContactPersonPhone" label="乙方签约人手机号" width="180"></el-table-column>
+              <el-table-column prop="auditDataObj.partyBSignTime" label="乙方签约时间" width="120"></el-table-column>
             </el-table>
             <div class="container-right-bottom">
               <div>
-                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="textarea"></el-input>
+                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="auditResult.result"></el-input>
               </div>
               <div class="container-right-bottom-btn">
-                <el-button type="primary">审核通过</el-button>
-                <el-button type="danger">审核驳回</el-button>
+                <el-button type="primary" @click="submitAuditPass">审核通过</el-button>
+                <el-button type="danger" @click="submitAuditReject">审核驳回</el-button>
               </div>
             </div>
           </div>
@@ -57,25 +57,108 @@
 export default {
   data () {
     return {
-      image_1: 'http://pniquhm38.bkt.clouddn.com/2ec37620-7b8b-4d01-b180-df72753c78ba',
-      image_2: 'http://pniquhm38.bkt.clouddn.com/2ec37620-7b8b-4d01-b180-df72753c78ba',
-      image_3: 'http://pniquhm38.bkt.clouddn.com/2ec37620-7b8b-4d01-b180-df72753c78ba',
-      textarea: '',
-      tableData: [{
-        customerId: '1',
-        contractId: '1',
-        customerContractType: '商家-平台',
-        customerContractNum: 'WM-P-123456789',
-        contractEndTime: '2020-03-06',
-        partyA: '甲方',
-        partyAContactPerson: '朱家琨',
-        partyAContactPersonPhone: '12345678900',
-        partyASignTime: '2019-03-06',
-        partyB: '乙方',
-        partyBContactPerson: '朱家琨',
-        partyBContactPersonPhone: '12345678900',
-        partyBSignTime: '2019-03-06'
-      }]
+      image_1: '',
+      image_2: '',
+      image_3: '',
+      tableData: [],
+      auditResult: {
+        auditTaskId: 0,
+        auditStatus: 203,
+        result: '',
+        opUser: ''
+      }
+    }
+  },
+  mounted () {
+    this.taskId = this.auditResult.auditTaskId = this.$store.state.auditTaskId
+    this.opUser = this.$store.state.userId
+    this.fetchData()
+  },
+  methods: {
+    fetchData () {
+      let self = this
+      let targetUrl = '/api/audit/detail/' + this.taskId
+      console.log(targetUrl)
+      this.$axios.post(targetUrl, {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    submitAuditPass () {
+      let self = this
+      this.auditResult.auditStatus = this.$store.state.auditPassStatus
+      this.$axios.post('/api/audit/saveAuditResult', this.$qs.stringify(self.auditResult), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$message({
+            message: '审核通过',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.$router.push('/audit/AuditTaskHandle')
+    },
+    submitAuditReject () {
+      let self = this
+      if (this.auditResult.result === '') {
+        self.$message({
+          message: '驳回原因必填',
+          type: 'warning'
+        })
+      } else {
+        self.auditResult.auditStatus = self.$store.state.auditRejectStatus
+        self.$axios.post('/api/audit/saveAuditResult', self.$qs.stringify(self.auditResult), {
+          headers: {
+            'Access-Control-Allow-Origin': 'http://127.0.0.1',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then(function (response) {
+          console.log(response)
+          const _data = response.data
+          if (_data.code === 200) {
+            self.$message({
+              message: '审核驳回',
+              type: 'warning'
+            })
+          } else {
+            self.$message({
+              message: _data.msg,
+              type: 'warning'
+            })
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
+        this.$router.push('/audit/AuditTaskHandle')
+      }      
     }
   }
 }

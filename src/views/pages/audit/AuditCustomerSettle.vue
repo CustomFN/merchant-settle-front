@@ -13,35 +13,35 @@
           <div class="">
             <el-table :data="tableData" border style="width:241px">
               <el-table-column prop="customerId" label="客户ID" width="120px"></el-table-column>
-              <el-table-column prop="settleId" label="结算ID" width="120px"></el-table-column>
+              <el-table-column prop="auditDataObj.settleId" label="结算ID" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="settleAccType" label="结算账户类型" width="180px"></el-table-column>
-              <el-table-column prop="settleAccName" label="结算账户开户名" width="180px"></el-table-column>
-              <el-table-column prop="settleAccNo" label="结算账号" ></el-table-column>
+              <el-table-column prop="auditDataObj.settleAccType" label="结算账户类型" width="180px"></el-table-column>
+              <el-table-column prop="auditDataObj.settleAccName" label="结算账户开户名" width="180px"></el-table-column>
+              <el-table-column prop="auditDataObj.settleAccNo" label="结算账号" ></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="bankName" label="银行"></el-table-column>
-              <el-table-column prop="reservePhoneNum" label="预留手机号" width="180"></el-table-column>
+              <el-table-column prop="auditDataObj.bankName" label="银行"></el-table-column>
+              <el-table-column prop="auditDataObj.reservePhoneNum" label="预留手机号" width="180"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="financialOfficer" label="财务负责人" width="120"></el-table-column>
-              <el-table-column prop="financialOfficerPhone" label="财务负责人手机号" width="180"></el-table-column>
-              <el-table-column prop="financialOfficerCertificatesType" label="财务负责人证件类型" width="180"></el-table-column>
-              <el-table-column prop="financialOfficerCertificatesNum" label="财务负责人证件号码"></el-table-column>
+              <el-table-column prop="auditDataObj.financialOfficer" label="财务负责人" width="120"></el-table-column>
+              <el-table-column prop="auditDataObj.financialOfficerPhone" label="财务负责人手机号" width="180"></el-table-column>
+              <el-table-column prop="auditDataObj.financialOfficerCertificatesType" label="财务负责人证件类型" width="180"></el-table-column>
+              <el-table-column prop="auditDataObj.financialOfficerCertificatesNum" label="财务负责人证件号码"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="settleType" label="结算方式"></el-table-column>
-              <el-table-column prop="settleCycle" label="结算周期"></el-table-column>
-              <el-table-column prop="settleMinAmount" label="最低结算金额/元"></el-table-column>
+              <el-table-column prop="auditDataObj.settleType" label="结算方式"></el-table-column>
+              <el-table-column prop="auditDataObj.settleCycle" label="结算周期"></el-table-column>
+              <el-table-column prop="auditDataObj.settleMinAmount" label="最低结算金额/元"></el-table-column>
             </el-table>
             <div class="container-right-bottom">
               <div>
-                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="textarea"></el-input>
+                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="auditResult.result"></el-input>
               </div>
               <div class="container-right-bottom-btn">
-                <el-button type="primary">审核通过</el-button>
-                <el-button type="danger">审核驳回</el-button>
+                <el-button type="primary" @click="submitAuditPass()">审核通过</el-button>
+                <el-button type="danger" @click="submitAuditReject()">审核驳回</el-button>
               </div>
             </div>
           </div>
@@ -55,23 +55,105 @@
 export default {
   data () {
     return {
-      textarea: '',
-      tableData: [{
-        customerId: '1',
-        settleId: '1',
-        settleAccType: '对公',
-        settleAccName: '全渠道',
-        settleAccNo: '66666666666',
-        bankName: '北京市-朝阳区-中国建设银行',
-        reservePhoneNum: '12345678900',
-        financialOfficer: '朱家琨',
-        financialOfficerPhone: '12345678900',
-        financialOfficerCertificatesType: '中国居民身份证',
-        financialOfficerCertificatesNum: '4521111111111',
-        settleType: '系统自动结算',
-        settleCycle: '3天',
-        settleMinAmount: '10.0'
-      }]
+      tableData: [],
+      auditResult: {
+        auditTaskId: 0,
+        auditStatus: 203,
+        result: '',
+        opUser: ''
+      }
+    }
+  },
+  mounted () {
+    this.taskId = this.auditResult.auditTaskId = this.$store.state.auditTaskId
+    this.opUser = this.$store.state.userId
+    this.fetchData()
+  },
+  methods: {
+    fetchData () {
+      let self = this
+      let targetUrl = '/api/audit/detail/' + this.taskId
+      console.log(targetUrl)
+      this.$axios.post(targetUrl, {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    submitAuditPass () {
+      let self = this
+      this.auditResult.auditStatus = this.$store.state.auditPassStatus
+      this.$axios.post('/api/audit/saveAuditResult', this.$qs.stringify(self.auditResult), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$message({
+            message: '审核通过',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.$router.push('/audit/AuditTaskHandle')
+    },
+    submitAuditReject () {
+      let self = this
+      if (this.auditResult.result === '') {
+        self.$message({
+          message: '驳回原因必填',
+          type: 'warning'
+        })
+      } else {
+        self.auditResult.auditStatus = self.$store.state.auditRejectStatus
+        self.$axios.post('/api/audit/saveAuditResult', self.$qs.stringify(self.auditResult), {
+          headers: {
+            'Access-Control-Allow-Origin': 'http://127.0.0.1',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then(function (response) {
+          console.log(response)
+          const _data = response.data
+          if (_data.code === 200) {
+            self.$message({
+              message: '审核驳回',
+              type: 'warning'
+            })
+            self.$router.go(-1)
+          } else {
+            self.$message({
+              message: _data.msg,
+              type: 'warning'
+            })
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
+      }      
     }
   }
 }

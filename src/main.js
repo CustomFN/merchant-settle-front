@@ -45,7 +45,9 @@ const store = new Vuex.Store({
     customerId: localStorage.getItem('customerId') || 0,
     contractId: localStorage.getItem('contractId') || 0,
     wmPoiId: localStorage.getItem('wmPoiId') || 0,
-    auditTaskId: localStorage.getItem('auditTaskId') || 0
+    auditTaskId: localStorage.getItem('auditTaskId') || 0,
+    auditPassStatus: localStorage.getItem('auditPassStatus') || 203,
+    auditRejectStatus: localStorage.getItem('auditRejectStatus') || 202
   },
   mutations: {
     setCustomerId (state, val) {

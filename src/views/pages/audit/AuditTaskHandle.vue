@@ -20,7 +20,7 @@
       </div>
       <div class="container-footer">
         <el-tabs type="border-card" v-model="activeName"  @tab-click="getTabData">
-          <el-tab-pane label="待分配" name="1">
+          <el-tab-pane label="待处理" name="1">
             <el-table :data="tableData" style="width: 100%">
               <el-table-column prop="id" label="任务ID" width="150"></el-table-column>
               <el-table-column prop="auditTypeStr" label="审核类型" width="200"></el-table-column>
@@ -128,11 +128,32 @@ export default {
         console.log(error)
       })
     },
-    handleAudit () {
-      this.$router.push('/audit/auditwmpoibaseinfo')
+    handleAudit (row) {
+      this.handleViewRoute(row.id, row.auditType)
     },
-    handleView () {
-      this.$router.push('/audit/auditcustomer')
+    handleView (row) {
+      this.handleViewRoute(row.id, row.auditType)
+    },
+    handleViewRoute(auditTaskId, auditType) {
+      this.$store.dispatch('setAuditTaskIdAction', auditTaskId)
+      let self = this
+      if (auditType === 1) {
+        self.$router.push('/audit/auditcustomer')
+      } else if (auditType === 2) {
+        self.$router.push('/audit/auditcustomerkp')
+      } else if (auditType === 3) {
+        self.$router.push('/audit/auditcustomercontract')
+      } else if (auditType === 4) {
+        self.$router.push('/audit/auditcustomersettle')
+      } else if (auditType === 5) {
+        self.$router.push('/audit/auditwmpoibaseinfo')
+      } else if (auditType === 6) {
+        self.$router.push('/audit/auditwmpoiqua')
+      } else if (auditType === 7) {
+        self.$router.push('/audit/auditwmpoideliveryinfo')
+      } else if (auditType === 8) {
+        self.$router.push('/audit/auditwmpoibusinessinfo')
+      }
     },
     getTabData (tab) {
       let self = this

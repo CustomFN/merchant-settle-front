@@ -17,24 +17,28 @@
           <div class="">
             <el-table :data="tableData" border style="width: 100%">
               <el-table-column prop="customerId" label="客户ID" width="120"></el-table-column>
-              <el-table-column prop="customerType" label="客户类型" width="120"></el-table-column>
-              <el-table-column prop="customerName" label="客户名称"></el-table-column>
+              <el-table-column prop="auditDataObj.customerTypeStr" label="客户类型" width="120"></el-table-column>
+              <el-table-column prop="auditDataObj.customerName" label="客户名称"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="customerCertificatesNum" label="客户证件号" width="240"></el-table-column>
-              <el-table-column prop="customerCertificatesAddress" label="客户证件地址"></el-table-column>
+              <el-table-column prop="auditDataObj.customerCertificatesNum" label="客户证件号" width="240"></el-table-column>
+              <el-table-column prop="auditDataObj.customerCertificatesAddress" label="客户证件地址"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="customerLegalPerson" label="客户法人/经营者" width="240"></el-table-column>
-              <el-table-column prop="customerValidTime" label="客户有效期"></el-table-column>
+              <el-table-column prop="auditDataObj.customerLegalPerson" label="客户法人/经营者" width="240"></el-table-column>
+              <el-table-column label="客户有效期">
+                <template slot-scope="scope">
+                  <p>{{ scope.row.auditDataObj.customerValidTime | dateformat }}</p>
+                </template>
+              </el-table-column>
             </el-table>
             <div class="container-right-bottom">
               <div>
-                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="textarea"></el-input>
+                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="auditResult.result"></el-input>
               </div>
               <div class="container-right-bottom-btn">
-                <el-button type="primary">审核通过</el-button>
-                <el-button type="danger">审核驳回</el-button>
+                <el-button type="primary" @click="submitAuditPass()">审核通过</el-button>
+                <el-button type="danger" @click="submitAuditReject()">审核驳回</el-button>
               </div>
             </div>
           </div>
@@ -48,18 +52,110 @@
 export default {
   data () {
     return {
-      image_1: 'http://pniquhm38.bkt.clouddn.com/2ec37620-7b8b-4d01-b180-df72753c78ba',
-      image_2: 'http://pniquhm38.bkt.clouddn.com/2ec37620-7b8b-4d01-b180-df72753c78ba',
-      textarea: '',
-      tableData: [{
-        customerId: '1',
-        customerType: '营业执照',
-        customerName: '北京三快在线科技有限公司',
-        customerCertificatesNum: '911111111111111',
-        customerCertificatesAddress: '北京市朝阳区望京国际研发园',
-        customerLegalPerson: '王兴',
-        customerValidTime: '2033-12-22'
-      }]
+      image_1: '',
+      image_2: '',
+      tableData: [],
+      auditResult: {
+        auditTaskId: 0,
+        auditStatus: 20,
+        result: '',
+        opUser: ''
+      }
+    }
+  },
+  mounted () {
+    this.taskId = this.auditResult.auditTaskId = this.$store.state.auditTaskId
+    this.opUser = this.$store.state.userId
+    this.fetchData()
+  },
+  methods: {
+    fetchData () {
+      let self = this
+      let targetUrl = '/api/audit/detail/' + this.taskId
+      console.log(targetUrl)
+      this.$axios.post(targetUrl, {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data
+          let images = _data.data[0].auditDataObj.customerCertificatesPicArr
+          self.image_1 = images[0]
+          self.image_2 = images[1]
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    submitAuditPass () {
+      let self = this
+      this.auditResult.auditStatus = this.$store.state.auditPassStatus
+      this.$axios.post('/api/audit/saveAuditResult', this.$qs.stringify(self.auditResult), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$message({
+            message: '审核通过',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.$router.push('/audit/AuditTaskHandle')
+    },
+    submitAuditReject () {
+      let self = this
+      if (this.auditResult.result === '') {
+        self.$message({
+          message: '驳回原因必填',
+          type: 'warning'
+        })
+      } else {
+        self.auditResult.auditStatus = self.$store.state.auditRejectStatus
+        self.$axios.post('/api/audit/saveAuditResult', self.$qs.stringify(self.auditResult), {
+          headers: {
+            'Access-Control-Allow-Origin': 'http://127.0.0.1',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then(function (response) {
+          console.log(response)
+          const _data = response.data
+          if (_data.code === 200) {
+            self.$message({
+              message: '审核驳回',
+              type: 'warning'
+            })
+          } else {
+            self.$message({
+              message: _data.msg,
+              type: 'warning'
+            })
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
+        this.$router.push('/audit/AuditTaskHandle')
+      }
     }
   }
 }
