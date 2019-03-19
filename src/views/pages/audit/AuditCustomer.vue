@@ -121,7 +121,7 @@ export default {
       }).catch(function (error) {
         console.log(error)
       })
-      this.$router.push('/audit/AuditTaskHandle')
+      this.$router.go(-1)
     },
     submitAuditReject () {
       let self = this
@@ -154,7 +154,7 @@ export default {
         }).catch(function (error) {
           console.log(error)
         })
-        this.$router.push('/audit/AuditTaskHandle')
+        this.$router.go(-1)
       }
     }
   }

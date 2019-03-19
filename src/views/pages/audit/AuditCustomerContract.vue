@@ -6,8 +6,6 @@
           <el-tabs type="border-card">
             <el-tab-pane label="图片审核">
               <img :src="image_1" class="audit-pic"/>
-              <img :src="image_2" class="audit-pic"/>
-              <img :src="image_3" class="audit-pic"/>
             </el-tab-pane>
           </el-tabs>
         </el-col>
@@ -21,21 +19,33 @@
               <el-table-column prop="auditDataObj.contractId" label="合同ID" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="auditDataObj.customerContractType" label="合同类型" width="180px"></el-table-column>
+              <el-table-column prop="auditDataObj.customerContractTypeStr" label="合同类型" width="180px"></el-table-column>
               <el-table-column prop="auditDataObj.customerContractNum" label="合同编号"></el-table-column>
-              <el-table-column prop="auditDataObj.contractEndTime" label="合同有效期" width="180px"></el-table-column>
+              <el-table-column prop="auditDataObj.contractEndTime" label="合同有效期" width="180px">
+                <template slot-scope="scope">
+                  <p>{{ scope.row.auditDataObj.contractEndTime | dateformat }}</p>
+                </template>
+              </el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
               <el-table-column prop="auditDataObj.partyA" label="甲方"></el-table-column>
               <el-table-column prop="auditDataObj.partyAContactPerson" label="甲方签约人" width="120"></el-table-column>
               <el-table-column prop="auditDataObj.partyAContactPersonPhone" label="甲方签约人手机号" width="180"></el-table-column>
-              <el-table-column prop="auditDataObj.partyASignTime" label="甲方签约时间" width="120"></el-table-column>
+              <el-table-column label="甲方签约时间" width="120">
+                <template slot-scope="scope">
+                  <p>{{ scope.row.auditDataObj.partyASignTime | dateformat }}</p>
+                </template>
+              </el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
               <el-table-column prop="auditDataObj.partyB" label="乙方"></el-table-column>
               <el-table-column prop="auditDataObj.partyBContactPerson" label="乙方签约人" width="120"></el-table-column>
               <el-table-column prop="auditDataObj.partyBContactPersonPhone" label="乙方签约人手机号" width="180"></el-table-column>
-              <el-table-column prop="auditDataObj.partyBSignTime" label="乙方签约时间" width="120"></el-table-column>
+              <el-table-column label="乙方签约时间" width="120">
+                <template slot-scope="scope">
+                  <p>{{ scope.row.auditDataObj.partyBSignTime | dateformat }}</p>
+                </template>
+              </el-table-column>
             </el-table>
             <div class="container-right-bottom">
               <div>
@@ -58,8 +68,6 @@ export default {
   data () {
     return {
       image_1: '',
-      image_2: '',
-      image_3: '',
       tableData: [],
       auditResult: {
         auditTaskId: 0,
@@ -89,6 +97,8 @@ export default {
         const _data = response.data
         if (_data.code === 200) {
           self.tableData = _data.data
+          let images = _data.data[0].auditDataObj.contractScanArr
+          self.image_1 = images[0]
         } else {
           self.$message({
             message: _data.msg,
@@ -124,7 +134,7 @@ export default {
       }).catch(function (error) {
         console.log(error)
       })
-      this.$router.push('/audit/AuditTaskHandle')
+      this.$router.go(-1)
     },
     submitAuditReject () {
       let self = this
@@ -157,8 +167,8 @@ export default {
         }).catch(function (error) {
           console.log(error)
         })
-        this.$router.push('/audit/AuditTaskHandle')
-      }      
+        this.$router.go(-1)
+      }
     }
   }
 }

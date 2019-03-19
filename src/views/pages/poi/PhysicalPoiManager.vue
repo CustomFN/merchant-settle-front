@@ -12,9 +12,6 @@ y<template>
           <el-form-item >
             <el-input placeholder="物理门店名称" v-model="searchParam.physicalPoiName"></el-input>
           </el-form-item>
-          <el-form-item >
-            <el-input placeholder="认领人" v-model="searchParam.physicalPoiPrincipal"></el-input>
-          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="doFilter()"><i class="el-icon-search"></i>搜索</el-button>
           </el-form-item>
@@ -56,52 +53,59 @@ export default {
         physicalPoiId: '',
         physicalCityId: '',
         physicalPoiName: '',
-        physicalPoiPrincipal: '王小虎'
+        claimed: 1,
+        pageNum: 1,
+        pageSize: 10
       },
-      tableData: [{
-        physicalCityId: 1,
-        physicalPoiName: '物理门店1',
-        physicalPoiPhone: '12345678900',
-        physicalPoiAddress: '北京市朝阳区望京国际研发园'
-      }, {
-        physicalCityId: 2,
-        physicalPoiName: '物理门店2',
-        physicalPoiPhone: '12345678900',
-        physicalPoiAddress: '北京市朝阳区望京国际研发园'
-      }, {
-        physicalCityId: 3,
-        physicalPoiName: '物理门店3',
-        physicalPoiPhone: '12345678900',
-        physicalPoiAddress: '北京市朝阳区望京国际研发园'
-      }],
+      tableData: [],
       total: 0,
       page: 1,
       pageSize: 10
     }
   },
+  mounted () {
+    this.fetchData()
+  },
   methods: {
+    fetchData () {
+      console.log(this.searchParam)
+      let self = this
+      this.$axios.post('/api/physicalpoi/list', this.$qs.stringify(self.searchParam), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data.data
+          self.page = _data.data.pageNum
+          self.pageSize = _data.data.pageSize
+          self.total = _data.data.totalSize
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    doFilter () {
+      this.fetchData()
+    },
     handleCooperate () {
       this.$router.push('/poi/wmpoiinfo')
     },
     handleSizeChange (val) {
-      this.page = val
-      console.log(this.page)
+      this.searchParam.pageNum = val
       this.fetchData()
     },
     handleCurrentChange (val) {
-      this.page = val
-      console.log(this.page)
+      this.searchParam.pageNum = val
       this.fetchData()
-    },
-    currentChangePage (list) {
-      let from = (this.page - 1) * this.pageSize
-      const to = this.page * this.pageSize
-      this.tableList = []
-      for (; from < to; from++) {
-        if (list[from]) {
-          this.tableList.push(list[from])
-        }
-      }
     }
   }
 }

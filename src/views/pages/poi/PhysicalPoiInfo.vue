@@ -2,16 +2,14 @@
   <div class="container-core">
     <el-form ref="form" :model="submitForm" label-width="120px" size="medium">
       <el-form-item label="物理城市">
-      <el-select v-model="submitForm.physicalCityId">
-        <el-option label="北京市" value="1"></el-option>
-        <el-option label="天津市" value="2"></el-option>
-      </el-select>
-    </el-form-item>
-    <el-form-item label="行政区/县">
-      <el-select v-model="submitForm.physicalRegionId">
-        <el-option label="朝阳区" value="1"></el-option>
-        <el-option label="海淀区" value="2"></el-option>
-      </el-select>
+        <el-select v-model="submitForm.physicalCityId">
+          <el-option v-for="item in physicalCities" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="行政区/县">
+        <el-select v-model="submitForm.physicalRegionId">
+          <el-option v-for="item in physicalRegions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="物理门店名称">
         <el-input v-model="submitForm.physicalPoiName"></el-input>
@@ -20,7 +18,9 @@
         <el-input v-model="submitForm.physicalPoiPhone"></el-input>
       </el-form-item>
       <el-form-item label="物理门店品类">
-        <el-input v-model="submitForm.physicalPoiCategory"></el-input>
+        <el-select v-model="submitForm.physicalPoiCategory">
+          <el-option v-for="item in categories" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="物理门店地址">
         <el-input v-model="submitForm.physicalPoiAddress"></el-input>
@@ -61,6 +61,27 @@ export default {
         physicalPoiLongitude: '',
         physicalPoiLatitude: ''
       },
+      physicalCities: [{
+        value: 1,
+        label: '北京市'
+      }, {
+        value: 2,
+        label: '天津市'
+      }],
+      physicalRegions: [{
+        value: 1,
+        label: '朝阳区'
+      }, {
+        value: 2,
+        label: '海淀区'
+      }],
+      categories: [{
+        value: 1,
+        label: '主食/米饭'
+      }, {
+        value: 2,
+        label: '主食/面条'
+      }],
       markers: [],
       searchOption: {
         city: '北京',
@@ -81,7 +102,34 @@ export default {
   },
   methods: {
     onSubmit () {
-      console.log('submit!')
+      console.log(this.submitForm)
+      let self = this
+      this.$axios.post('/api/physicalpoi/save', this.$qs.stringify(self.submitForm), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$message({
+            message: '保存成功',
+            type: 'success'
+          })
+          if (_data.data.status === 1) {
+            self.editDisabled = true
+          }
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.$router.go(-1)
     },
     onSearchResult (pois) {
       let latSum = 0

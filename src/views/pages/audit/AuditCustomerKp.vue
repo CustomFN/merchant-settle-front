@@ -20,12 +20,12 @@
               <el-table-column prop="customerId" label="客户ID" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 361px">
-              <el-table-column prop="auditDataObj.kpType" label="KP类型" width="120px"></el-table-column>
-              <el-table-column prop="auditDataObj.kpSiginType" label="KP签约类型" width="120px"></el-table-column>
+              <el-table-column prop="auditDataObj.kpTypeStr" label="KP类型" width="120px"></el-table-column>
+              <el-table-column prop="auditDataObj.kpSiginTypeStr" label="KP签约类型" width="120px"></el-table-column>
               <el-table-column prop="auditDataObj.kpName" label="KP姓名" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="auditDataObj.kpCertificatesType" label="证件类型" width="200"></el-table-column>
+              <el-table-column prop="auditDataObj.kpCertificatesTypeStr" label="证件类型" width="200"></el-table-column>
               <el-table-column prop="auditDataObj.kpCertificatesNum" label="证件号码"></el-table-column>
               <el-table-column prop="auditDataObj.kpPhoneNum" label="手机号" width="120px"></el-table-column>
             </el-table>
@@ -85,6 +85,11 @@ export default {
         const _data = response.data
         if (_data.code === 200) {
           self.tableData = _data.data
+          let images = _data.data[0].auditDataObj.customeraAuthorizationPicArr
+          self.image_1 = images[0]
+          images = _data.data[0].auditDataObj.customerKpCertificatesPicArr
+          self.image_2 = images[0]
+          self.image_3 = images[1]
         } else {
           self.$message({
             message: _data.msg,
@@ -120,7 +125,7 @@ export default {
       }).catch(function (error) {
         console.log(error)
       })
-      this.$router.push('/audit/AuditTaskHandle')
+      this.$router.go(-1)
     },
     submitAuditReject () {
       let self = this
@@ -153,8 +158,8 @@ export default {
         }).catch(function (error) {
           console.log(error)
         })
-        this.$router.push('/audit/AuditTaskHandle')
-      }   
+        this.$router.go(-1)
+      }
     }
   }
 }

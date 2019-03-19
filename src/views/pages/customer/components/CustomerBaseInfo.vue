@@ -123,7 +123,6 @@ export default {
       }).catch(function (error) {
         console.log(error)
       })
-
       this.submitForm.customerValidTime = validTime
     },
     fetchData () {

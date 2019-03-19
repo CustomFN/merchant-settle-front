@@ -16,7 +16,7 @@
               <el-table-column prop="auditDataObj.settleId" label="结算ID" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="auditDataObj.settleAccType" label="结算账户类型" width="180px"></el-table-column>
+              <el-table-column prop="auditDataObj.settleAccTypeStr" label="结算账户类型" width="180px"></el-table-column>
               <el-table-column prop="auditDataObj.settleAccName" label="结算账户开户名" width="180px"></el-table-column>
               <el-table-column prop="auditDataObj.settleAccNo" label="结算账号" ></el-table-column>
             </el-table>
@@ -27,12 +27,12 @@
             <el-table :data="tableData" border style="width: 100%">
               <el-table-column prop="auditDataObj.financialOfficer" label="财务负责人" width="120"></el-table-column>
               <el-table-column prop="auditDataObj.financialOfficerPhone" label="财务负责人手机号" width="180"></el-table-column>
-              <el-table-column prop="auditDataObj.financialOfficerCertificatesType" label="财务负责人证件类型" width="180"></el-table-column>
+              <el-table-column prop="auditDataObj.financialOfficerCertificatesTypeStr" label="财务负责人证件类型" width="180"></el-table-column>
               <el-table-column prop="auditDataObj.financialOfficerCertificatesNum" label="财务负责人证件号码"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="auditDataObj.settleType" label="结算方式"></el-table-column>
-              <el-table-column prop="auditDataObj.settleCycle" label="结算周期"></el-table-column>
+              <el-table-column prop="auditDataObj.settleTypeStr" label="结算方式"></el-table-column>
+              <el-table-column prop="auditDataObj.settleCycleStr" label="结算周期"></el-table-column>
               <el-table-column prop="auditDataObj.settleMinAmount" label="最低结算金额/元"></el-table-column>
             </el-table>
             <div class="container-right-bottom">
@@ -119,7 +119,7 @@ export default {
       }).catch(function (error) {
         console.log(error)
       })
-      this.$router.push('/audit/AuditTaskHandle')
+      this.$router.go(-1)
     },
     submitAuditReject () {
       let self = this
@@ -143,7 +143,6 @@ export default {
               message: '审核驳回',
               type: 'warning'
             })
-            self.$router.go(-1)
           } else {
             self.$message({
               message: _data.msg,
@@ -153,7 +152,8 @@ export default {
         }).catch(function (error) {
           console.log(error)
         })
-      }      
+        this.$router.go(-1)
+      }
     }
   }
 }

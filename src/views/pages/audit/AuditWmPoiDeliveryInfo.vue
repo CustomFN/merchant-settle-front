@@ -9,7 +9,7 @@
                 <div class="amap-page-container">
                   <el-amap vid="auditWmPoiDeliveryInfomap" :center="mapCenter" ref="map" :zoom="14" class="amap-demo">
                     <el-amap-marker v-for="(marker, index) in markers" :key="index" :position="marker" ></el-amap-marker>
-                    <el-amap-circle v-for="circle in circles" :center="circle.center" :radius="circle.radius" :fill-opacity="circle.fillOpacity"></el-amap-circle>
+                    <el-amap-circle v-for="(circle, index) in circles" :key="index" :center="circle.center" :radius="circle.radius" :fill-opacity="circle.fillOpacity"></el-amap-circle>
                   </el-amap>
                 </div>
               </div>

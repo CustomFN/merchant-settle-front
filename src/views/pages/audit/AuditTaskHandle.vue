@@ -134,7 +134,7 @@ export default {
     handleView (row) {
       this.handleViewRoute(row.id, row.auditType)
     },
-    handleViewRoute(auditTaskId, auditType) {
+    handleViewRoute (auditTaskId, auditType) {
       this.$store.dispatch('setAuditTaskIdAction', auditTaskId)
       let self = this
       if (auditType === 1) {

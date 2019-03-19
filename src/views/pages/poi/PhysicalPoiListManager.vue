@@ -29,7 +29,9 @@ y<template>
           <el-table-column prop="physicalPoiPhone" label="店内电话" width="200"></el-table-column>
           <el-table-column prop="physicalPoiAddress" label="地址"></el-table-column>
           <el-table-column label="操作">
-            <el-button type="text">认领</el-button>
+            <template slot-scope="scope">
+              <el-button type="text" @click="claimphysicalPoi(scope.row)">认领</el-button>
+            </template>
           </el-table-column>
         </el-table>
       </div>
@@ -55,52 +57,86 @@ export default {
       searchParam: {
         physicalPoiId: '',
         physicalCityId: '',
-        physicalPoiName: ''
+        physicalPoiName: '',
+        pageNum: 1,
+        pageSize: 10
       },
-      tableData: [{
-        physicalCityId: 1,
-        physicalPoiName: '物理门店1',
-        physicalPoiPhone: '12345678900',
-        physicalPoiAddress: '北京市朝阳区望京国际研发园'
-      }, {
-        physicalCityId: 2,
-        physicalPoiName: '物理门店2',
-        physicalPoiPhone: '12345678900',
-        physicalPoiAddress: '北京市朝阳区望京国际研发园'
-      }, {
-        physicalCityId: 3,
-        physicalPoiName: '物理门店3',
-        physicalPoiPhone: '12345678900',
-        physicalPoiAddress: '北京市朝阳区望京国际研发园'
-      }],
+      tableData: [],
       total: 0,
       page: 1,
       pageSize: 10
     }
   },
+  mounted () {
+    this.fetchData()
+  },
   methods: {
+    fetchData () {
+      console.log(this.searchParam)
+      let self = this
+      this.$axios.post('/api/physicalpoi/listall', this.$qs.stringify(self.searchParam), {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data.data
+          self.page = _data.data.pageNum
+          self.pageSize = _data.data.pageSize
+          self.total = _data.data.totalSize
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    doFilter () {
+      this.fetchData()
+    },
+    claimphysicalPoi (row) {
+      let self = this
+      let api = '/api/physicalpoi/claim/' + row.physicalCityId
+      this.$axios.post(api, {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$message({
+            message: '认领成功',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.fetchData()
+    },
     createPhysicalPoi () {
       this.$router.push('/poi/physicalpoiinfo')
     },
     handleSizeChange (val) {
-      this.page = val
-      console.log(this.page)
+      this.searchParam.pageNum = val
       this.fetchData()
     },
     handleCurrentChange (val) {
-      this.page = val
-      console.log(this.page)
+      this.searchParam.pageNum = val
       this.fetchData()
-    },
-    currentChangePage (list) {
-      let from = (this.page - 1) * this.pageSize
-      const to = this.page * this.pageSize
-      this.tableList = []
-      for (; from < to; from++) {
-        if (list[from]) {
-          this.tableList.push(list[from])
-        }
-      }
     }
   }
 }
