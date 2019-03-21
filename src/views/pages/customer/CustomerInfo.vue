@@ -28,8 +28,6 @@ export default {
     CustomerContract,
     CustomerSettle
   },
-  created () {
-  },
   data () {
     return {
       activeName: 'customerBaseInfo',

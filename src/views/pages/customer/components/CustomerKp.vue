@@ -227,8 +227,10 @@ export default {
       }).then(function (response) {
         const _data = response.data
         if (_data.code === 200) {
-          console.log(_data.data)
-          self.submitForm.kpCertificatesPicList.push(_data.data)
+          let length = _data.data.length
+          let index = _data.data.lastIndexOf('-')
+          let _name = _data.data.substring(index + 1, length)
+          self.submitForm.kpCertificatesPicList.push({name: _name, url: _data.data})
           self.$message({
             message: '上传成功',
             type: 'success'
@@ -265,8 +267,10 @@ export default {
       }).then(function (response) {
         const _data = response.data
         if (_data.code === 200) {
-          console.log(_data.data)
-          self.submitForm.kpAuthorizationPicList.push(_data.data)
+          let length = _data.data.length
+          let index = _data.data.lastIndexOf('-')
+          let _name = _data.data.substring(index + 1, length)
+          self.submitForm.kpAuthorizationPicList.push({name: _name, url: _data.data})
           self.$message({
             message: '上传成功',
             type: 'success'

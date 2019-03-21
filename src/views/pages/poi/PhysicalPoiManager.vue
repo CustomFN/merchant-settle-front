@@ -21,12 +21,14 @@ y<template>
     <el-card class="box-card container-footer">
       <div>
         <el-table :data="tableData" border style="width: 100%">
-          <el-table-column prop="physicalCityId" label="物理门店ID" width="150"></el-table-column>
+          <el-table-column prop="id" label="物理门店ID" width="150"></el-table-column>
           <el-table-column prop="physicalPoiName" label="物理门店名称"></el-table-column>
           <el-table-column prop="physicalPoiPhone" label="店内电话" width="200"></el-table-column>
           <el-table-column prop="physicalPoiAddress" label="地址"></el-table-column>
           <el-table-column label="操作">
-            <el-button type="text" @click="handleCooperate()">上单</el-button>
+            <template slot-scope="scope">
+              <el-button type="text" @click="handleCooperate(scope.row)">上单</el-button>
+            </template>
           </el-table-column>
         </el-table>
       </div>
@@ -70,7 +72,7 @@ export default {
     fetchData () {
       console.log(this.searchParam)
       let self = this
-      this.$axios.post('/api/physicalpoi/list', this.$qs.stringify(self.searchParam), {
+      this.$axios.post('/api/physicalpoi/list', this.$qs.stringify(this.searchParam), {
         headers: {
           'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -96,7 +98,8 @@ export default {
     doFilter () {
       this.fetchData()
     },
-    handleCooperate () {
+    handleCooperate (row) {
+      this.$store.dispatch('setPhysicalPoiIdAction', row.id)
       this.$router.push('/poi/wmpoiinfo')
     },
     handleSizeChange (val) {

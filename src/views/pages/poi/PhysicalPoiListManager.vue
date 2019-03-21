@@ -58,6 +58,7 @@ export default {
         physicalPoiId: '',
         physicalCityId: '',
         physicalPoiName: '',
+        claimed: 0,
         pageNum: 1,
         pageSize: 10
       },

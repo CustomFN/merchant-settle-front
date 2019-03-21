@@ -291,7 +291,10 @@ export default {
         const _data = response.data
         if (_data.code === 200) {
           console.log(_data.data)
-          self.submitForm.contractScanList.push(_data.data)
+          let length = _data.data.length
+          let index = _data.data.lastIndexOf('-')
+          let _name = _data.data.substring(index + 1, length)
+          self.submitForm.contractScanList.push({name: _name, url: _data.data})
           self.$message({
             message: '上传成功',
             type: 'success'

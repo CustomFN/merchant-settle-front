@@ -44,6 +44,7 @@ const store = new Vuex.Store({
   state: {
     customerId: localStorage.getItem('customerId') || 0,
     contractId: localStorage.getItem('contractId') || 0,
+    physicalPoiId: localStorage.getItem('physicalPoiId') || 0,
     wmPoiId: localStorage.getItem('wmPoiId') || 0,
     auditTaskId: localStorage.getItem('auditTaskId') || 0,
     auditPassStatus: localStorage.getItem('auditPassStatus') || 203,
@@ -62,6 +63,10 @@ const store = new Vuex.Store({
       localStorage.setItem('wmPoiId', val)
       state.wmPoiId = val
     },
+    setPhysicalPoiId (state, val) {
+      localStorage.setItem('physicalPoiId', val)
+      state.physicalPoiId = val
+    },
     setAuditTaskId (state, val) {
       localStorage.setItem('auditTaskId', val)
       state.auditTaskId = val
@@ -76,6 +81,9 @@ const store = new Vuex.Store({
     },
     setWmPoiIdAction (context, val) {
       context.commit('setWmPoiId', val)
+    },
+    setPhysicalPoiIdAction (context, val) {
+      context.commit('setPhysicalPoiId', val)
     },
     setAuditTaskIdAction (context, val) {
       context.commit('setAuditTaskId', val)

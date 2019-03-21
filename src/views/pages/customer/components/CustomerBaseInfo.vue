@@ -95,7 +95,6 @@ export default {
       let validTime = this.submitForm.customerValidTime
       let unixtime = this.$moment(validTime).format('X')
       this.submitForm.customerValidTime = unixtime
-      console.log(this.submitForm)
       let self = this
       this.$axios.post('/api/customer/save', this.$qs.stringify(self.submitForm), {
         headers: {
@@ -177,8 +176,10 @@ export default {
       }).then(function (response) {
         const _data = response.data
         if (_data.code === 200) {
-          console.log(_data.data)
-          self.submitForm.customerCertificatesPicList.push(_data.data)
+          let length = _data.data.length
+          let index = _data.data.lastIndexOf('-')
+          let _name = _data.data.substring(index + 1, length)
+          self.submitForm.customerCertificatesPicList.push({name: _name, url: _data.data})
           self.$message({
             message: '上传成功',
             type: 'success'
