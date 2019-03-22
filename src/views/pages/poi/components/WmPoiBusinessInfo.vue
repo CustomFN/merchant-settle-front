@@ -74,7 +74,6 @@ export default {
       let self = this
       this.$axios.post('/api/wmpoi/businessinfo/save/', this.$qs.stringify(this.submitForm), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -101,7 +100,6 @@ export default {
       let targetUrl = '/api/wmpoi/businessinfo/show/' + this.submitForm.id
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {

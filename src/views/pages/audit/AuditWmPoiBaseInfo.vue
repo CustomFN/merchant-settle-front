@@ -11,8 +11,7 @@
             <el-tab-pane label="地图坐标审核">
             <div class="audit-map">
               <div class="amap-page-container">
-                <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
-                <el-amap vid="auditWmPoiBaseInfomap" :center="mapCenter" :zoom="14" :events="events" class="amap-demo">
+                <el-amap vid="auditWmPoiBaseInfomap" :center="mapCenter" :zoom="14" class="amap-demo">
                   <el-amap-marker v-for="(marker, index) in markers" :key="index" :position="marker" ></el-amap-marker>
                 </el-amap>
               </div>
@@ -26,32 +25,32 @@
           <h3>审核信息</h3>
           <div class="">
             <el-table :data="tableData" border style="width:241px">
-              <el-table-column prop="customerId" label="客户ID" width="120px"></el-table-column>
-              <el-table-column prop="wmPoiId" label="门店ID" width="120px"></el-table-column>
+              <el-table-column prop="auditDataObj.customerId" label="客户ID" width="120px"></el-table-column>
+              <el-table-column prop="auditDataObj.wmPoiId" label="门店ID" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="wmPoiName" label="门店名称"></el-table-column>
+              <el-table-column prop="auditDataObj.wmPoiName" label="门店名称"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="wmPoiLinkMan" label="门店联系人" width="180px"></el-table-column>
-              <el-table-column prop="wmPoiPhone" label="门店联系人电话" ></el-table-column>
-              <el-table-column prop="wmPoiCategory" label="门店经营品类"></el-table-column>
+              <el-table-column prop="auditDataObj.wmPoiLinkMan" label="门店联系人" width="180px"></el-table-column>
+              <el-table-column prop="auditDataObj.wmPoiPhone" label="门店联系人电话" ></el-table-column>
+              <el-table-column prop="auditDataObj.wmPoiCategory" label="门店经营品类"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="wmPoiCityRegion" label="门店城市" width="180"></el-table-column>
-              <el-table-column prop="wmPoiAddress" label="门店地址"></el-table-column>
+              <el-table-column prop="auditDataObj.wmPoiCityRegion" label="门店城市" width="180"></el-table-column>
+              <el-table-column prop="auditDataObj.wmPoiAddress" label="门店地址"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="wmPoiLongitude" label="经度"></el-table-column>
-              <el-table-column prop="wmPoiLatitude" label="纬度"></el-table-column>
+              <el-table-column prop="auditDataObj.wmPoiLongitude" label="经度"></el-table-column>
+              <el-table-column prop="auditDataObj.wmPoiLatitude" label="纬度"></el-table-column>
             </el-table>
             <div class="container-right-bottom">
               <div>
-                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="textarea"></el-input>
+                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="auditResult.result"></el-input>
               </div>
               <div class="container-right-bottom-btn">
-                <el-button type="primary">审核通过</el-button>
-                <el-button type="danger">审核驳回</el-button>
+                <el-button type="primary" @click="submitAuditPass()">审核通过</el-button>
+                <el-button type="danger" @click="submitAuditReject()">审核驳回</el-button>
               </div>
             </div>
           </div>
@@ -65,21 +64,15 @@
 export default {
   data () {
     return {
-      image_1: 'http://pniquhm38.bkt.clouddn.com/2ec37620-7b8b-4d01-b180-df72753c78ba',
-      image_2: 'http://pniquhm38.bkt.clouddn.com/2ec37620-7b8b-4d01-b180-df72753c78ba',
-      textarea: '',
-      tableData: [{
-        customerId: '1',
-        wmPoiId: '1',
-        wmPoiName: '黄焖鸡大米饭',
-        wmPoiLinkMan: '全渠道',
-        wmPoiPhone: '12345678900',
-        wmPoiCategory: '主食/米饭',
-        wmPoiCityRegion: '北京市/朝阳区',
-        wmPoiAddress: '北京市朝阳区望京国际研发园',
-        wmPoiLongitude: '1.111111',
-        wmPoiLatitude: '1.111111'
-      }],
+      image_1: '',
+      image_2: '',
+      tableData: [],
+      auditResult: {
+        auditTaskId: 0,
+        auditStatus: 203,
+        result: '',
+        opUser: ''
+      },
       markers: [
         [121.59996, 31.197646]
       ],
@@ -87,33 +80,106 @@ export default {
         city: '北京',
         citylimit: false
       },
-      mapCenter: [121.59996, 31.197646],
-      events: {
-        click (e) {
-          let { lng, lat } = e.lnglat
-
-          self.markers = []
-          self.markers.push([lng, lat])
-        }
-      }
+      mapCenter: [121.59996, 31.197646]
     }
   },
+  mounted () {
+    this.auditResult.auditTaskId = this.$store.state.auditTaskId
+    this.auditResult.opUser = this.$cookies.get('user').userId
+    this.fetchData()
+  },
   methods: {
-    onSearchResult (pois) {
-      let latSum = 0
-      let lngSum = 0
-      if (pois.length > 0) {
-        pois.forEach(poi => {
-          let {lng, lat} = poi
-          lngSum += lng
-          latSum += lat
-          this.markers.push([poi.lng, poi.lat])
-        })
-        let center = {
-          lng: lngSum / pois.length,
-          lat: latSum / pois.length
+    fetchData () {
+      let self = this
+      let targetUrl = '/api/audit/detail/' + this.auditResult.auditTaskId
+      this.$axios.post(targetUrl, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
         }
-        this.mapCenter = [center.lng, center.lat]
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.handleShowAuditTask(_data.data)
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    handleShowAuditTask (data) {
+      this.tableData = data
+
+      // let images = data[0].auditDataObj.wmPoiLogoList
+      // self.image_1 = images[0]
+      // images = data[0].auditDataObj.wmPoiEnvironmentPicList
+      // self.image_2 = images[0]
+
+      let mapPosition = [Number(data[0].auditDataObj.wmPoiLongitude), Number(data[0].auditDataObj.wmPoiLatitude)]
+      this.mapCenter = mapPosition
+      this.markers.push(mapPosition)
+    },
+    submitAuditPass () {
+      let self = this
+      this.auditResult.auditStatus = this.$store.state.auditPassStatus
+      this.$axios.post('/api/audit/saveAuditResult', this.$qs.stringify(self.auditResult), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$message({
+            message: '审核通过',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.$router.go(-1)
+    },
+    submitAuditReject () {
+      let self = this
+      if (this.auditResult.result === '') {
+        self.$message({
+          message: '驳回原因必填',
+          type: 'warning'
+        })
+      } else {
+        self.auditResult.auditStatus = self.$store.state.auditRejectStatus
+        self.$axios.post('/api/audit/saveAuditResult', self.$qs.stringify(self.auditResult), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then(function (response) {
+          console.log(response)
+          const _data = response.data
+          if (_data.code === 200) {
+            self.$message({
+              message: '审核驳回',
+              type: 'warning'
+            })
+          } else {
+            self.$message({
+              message: _data.msg,
+              type: 'warning'
+            })
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
+        this.$router.go(-1)
       }
     }
   }

@@ -77,7 +77,6 @@ export default {
       let self = this
       this.$axios.post('/api/physicalpoi/listall', this.$qs.stringify(self.searchParam), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -106,7 +105,6 @@ export default {
       let api = '/api/physicalpoi/claim/' + row.physicalCityId
       this.$axios.post(api, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {

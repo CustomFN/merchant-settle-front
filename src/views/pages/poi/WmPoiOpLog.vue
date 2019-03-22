@@ -1,19 +1,19 @@
-y<template>
+<template>
   <div class="app-container">
     <el-card class="box-card">
       <div>
         <el-form :inline="true">
           <el-form-item >
-            <el-input placeholder="外卖城市" v-model="searchParam.wmCityId"></el-input>
+            <el-input placeholder="外卖门店ID" v-model="searchParam.wmPoiId" disabled></el-input>
           </el-form-item>
           <el-form-item >
-            <el-input placeholder="外卖门店ID" v-model="searchParam.wmPoiId"></el-input>
+            <el-input placeholder="模块" v-model="searchParam.module"></el-input>
           </el-form-item>
           <el-form-item >
-            <el-input placeholder="外卖门店名称" v-model="searchParam.wmPoiName"></el-input>
+            <el-input placeholder="内容" v-model="searchParam.content"></el-input>
           </el-form-item>
           <el-form-item >
-            <el-input placeholder="外卖门店责任人" v-model="searchParam.wmPoiPrincipal" disabled></el-input>
+            <el-input placeholder="操作人" v-model="searchParam.opUser"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="doFilter()"><i class="el-icon-search"></i>搜索</el-button>
@@ -24,20 +24,18 @@ y<template>
     <el-card class="box-card container-footer">
       <div>
         <el-table :data="tableData" border style="width: 100%">
-          <el-table-column prop="wmPoiId" label="门店ID" width="100"></el-table-column>
-          <el-table-column prop="wmPoiName" label="门店名称"></el-table-column>
-          <el-table-column prop="wmPoiTel" label="电话" width="130"></el-table-column>
-          <el-table-column prop="wmPoiAddress" label="地址"></el-table-column>
-          <el-table-column prop="wmPoiCategory" label="品类" width="180"></el-table-column>
-          <el-table-column label="上单状态" width="100">
+          <el-table-column prop="id" label="ID" width="120"></el-table-column>
+          <el-table-column prop="module" label="模块" width="100"></el-table-column>
+          <el-table-column prop="content" label="内容"></el-table-column>
+          <el-table-column label="操作人" width="150">
             <template slot-scope="scope">
-              <el-tag size="small" type="">{{ scope.row.wmPoiCoopState }}</el-tag>
+              <p> {{ scope.row.opUser }}({{ scope.row.opUserId }})</p>
             </template>
           </el-table-column>
-          <el-table-column prop="wmPoiPrincipal" label="门店责任人" width="120"></el-table-column>
-          <el-table-column label="操作" width="200">
-            <el-button type="text" @click="handleUpdate()">修改信息</el-button>
-            <el-button type="text">操作日志</el-button>
+          <el-table-column label="操作时间" width="200">
+            <template slot-scope="scope">
+              <p>{{ scope.row.ctime | dateformat('YYYY-DD-MM HH:mm:ss') }}</p>
+            </template>
           </el-table-column>
         </el-table>
       </div>
@@ -51,7 +49,7 @@ y<template>
                         @current-change="handleCurrentChange"
                         style="text-align:center;">
         </el-pagination>
-      </div>
+          </div>
     </el-card>
   </div>
 </template>
@@ -62,9 +60,9 @@ export default {
     return {
       searchParam: {
         wmPoiId: '',
-        wmCityId: '',
-        wmPoiName: '',
-        wmPoiPrincipal: '',
+        module: '',
+        content: '',
+        opUserId: '',
         pageNum: 1,
         pageSize: 10
       },
@@ -75,14 +73,14 @@ export default {
     }
   },
   mounted () {
-    this.searchParam.wmPoiPrincipal = this.$cookies.get('user').userId
+    this.searchParam.wmPoiId = this.$store.state.wmPoiId
     this.fetchData()
   },
   methods: {
     fetchData () {
       console.log(this.searchParam)
       let self = this
-      this.$axios.post('/api/wmpoi/list', this.$qs.stringify(self.searchParam), {
+      this.$axios.post('/api/wmpoi/log/list', this.$qs.stringify(self.searchParam), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -107,15 +105,14 @@ export default {
     doFilter () {
       this.fetchData()
     },
-    handleUpdate () {
-      this.$router.push('/poi/wmpoiinfo')
-    },
     handleSizeChange (val) {
       this.searchParam.pageNum = val
+      console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
       this.searchParam.pageNum = val
+      console.log(this.page)
       this.fetchData()
     }
   }

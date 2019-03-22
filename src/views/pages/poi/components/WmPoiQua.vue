@@ -164,7 +164,6 @@ export default {
       this.submitForm.wmPoiBusinessLicenceValidTime = unixtime
       this.$axios.post('/api/wmpoi/qua/save/', this.$qs.stringify(this.submitForm), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -192,7 +191,6 @@ export default {
       let targetUrl = '/api/wmpoi/qua/show/' + this.submitForm.wmPoiId
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -249,7 +247,6 @@ export default {
       formData.append('chunk', '0')
       this.$axios.post('/api/ui/upload', formData, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'multipart/form-data'
         }
       }).then(function (response) {
@@ -281,7 +278,6 @@ export default {
       formData.append('chunk', '0')
       this.$axios.post('/api/ui/upload', formData, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'multipart/form-data'
         }
       }).then(function (response) {

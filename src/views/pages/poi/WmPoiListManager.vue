@@ -4,10 +4,10 @@ y<template>
       <div>
         <el-form :inline="true">
           <el-form-item >
-            <el-input placeholder="外卖城市" v-model="searchParam.wmPoiId"></el-input>
+            <el-input placeholder="外卖城市" v-model="searchParam.wmCityId"></el-input>
           </el-form-item>
           <el-form-item >
-            <el-input placeholder="外卖门店ID" v-model="searchParam.wmCityId"></el-input>
+            <el-input placeholder="外卖门店ID" v-model="searchParam.wmPoiId"></el-input>
           </el-form-item>
           <el-form-item >
             <el-input placeholder="外卖门店名称" v-model="searchParam.wmPoiName"></el-input>
@@ -28,17 +28,18 @@ y<template>
           <el-table-column prop="wmPoiName" label="门店名称"></el-table-column>
           <el-table-column prop="wmPoiTel" label="电话" width="130"></el-table-column>
           <el-table-column prop="wmPoiAddress" label="地址"></el-table-column>
-          <el-table-column prop="wmPoiCategory" label="品类" width="180"></el-table-column>
-          <el-table-column label="上单状态" width="100">
+          <el-table-column prop="wmPoiCategory" label="品类" width="160"></el-table-column>
+          <el-table-column label="上单状态" width="80">
             <template slot-scope="scope">
               <el-tag size="small" type="">{{ scope.row.wmPoiCoopState }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="wmPoiPrincipal" label="门店责任人" width="120"></el-table-column>
-          <el-table-column label="操作" width="200">
+          <el-table-column prop="wmPoiPrincipal" label="门店责任人" width="100"></el-table-column>
+          <el-table-column label="操作" width="270">
             <template slot-scope="scope">
               <el-button type="text" @click="handleUpdate(scope.row)">修改信息</el-button>
               <el-button type="text" @click="showDistribution(scope.row)">分配门店责任人</el-button>
+              <el-button type="text" @click="showOpLog(scope.row)">操作日志</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -102,7 +103,6 @@ export default {
       let self = this
       this.$axios.post('/api/wmpoi/list', this.$qs.stringify(self.searchParam), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -126,6 +126,10 @@ export default {
     doFilter () {
       this.fetchData()
     },
+    showOpLog (row) {
+      this.$store.dispatch('setWmPoiIdAction', row.wmPoiId)
+      this.$router.push('/poi/wmpoioplog')
+    },
     handleUpdate (row) {
       this.$store.dispatch('setWmPoiIdAction', row.wmPoiId)
       this.$router.push('/poi/wmpoiinfo')
@@ -139,7 +143,6 @@ export default {
       let self = this
       this.$axios.post('/api/wmpoi/distributePrincipal', this.$qs.stringify(self.distributeParam), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {

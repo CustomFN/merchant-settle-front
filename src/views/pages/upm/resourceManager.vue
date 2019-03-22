@@ -191,7 +191,6 @@ export default {
       let self = this
       this.$axios.post('/api/resource/save', this.$qs.stringify(self.submitForm), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -224,7 +223,6 @@ export default {
       let self = this
       this.$axios.post('/api/resource/list', {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -261,7 +259,6 @@ export default {
       let self = this
       this.$axios.post('/api/resource/delete', this.$qs.stringify({'resourceId': data.resourceId}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {

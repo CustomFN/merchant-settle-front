@@ -43,27 +43,27 @@ export default {
   },
   methods: {
     logout () {
-      // let self = this
-      // this.$axios.post('/api/logout', {
-      //   headers: {
-      //     'Access-Control-Allow-Origin': 'http://127.0.0.1',
-      //     'Content-Type': 'application/x-www-form-urlencoded'
-      //   }
-      // }).then(function (response) {
-      //   console.log(response.data)
-      //   const _data = response.data
-      //   if (_data.code === 200) {
-      //     self.$router.push('/')
-      //   } else {
-      //     alert(_data.msg)
-      //   }
-      // }).catch(function (err) {
-      //   if (err.response) {
-      //     console.log(err.response)
-      //   }
-      // })
-      this.$cookies.remove('user')
-      this.$router.push('/login')
+      let self = this
+      self.$axios.post('/api/logout', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response.data)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$cookies.remove('user')
+          self.$router.push('/login')
+        } else {
+          alert(_data.msg)
+        }
+      }).catch(function (err) {
+        if (err.response) {
+          console.log(err.response)
+        }
+      })
+      // this.$cookies.remove('user')
+      // this.$router.push('/login')
     }
   }
 }

@@ -178,7 +178,6 @@ export default {
       let self = this
       this.$axios.post('/api/customer/settle/save', this.$qs.stringify(self.submitForm), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -208,7 +207,6 @@ export default {
       this.searchParam.customerId = this.$store.state.customerId
       this.$axios.post('/api/customer/settle/list', this.$qs.stringify(this.searchParam), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -245,7 +243,6 @@ export default {
       console.log(targetUrl)
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {

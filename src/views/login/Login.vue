@@ -72,7 +72,6 @@ export default {
       let self = this
       self.$axios.post('/api/login', this.$qs.stringify(this.loginForm), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {

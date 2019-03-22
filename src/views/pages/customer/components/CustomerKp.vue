@@ -13,9 +13,9 @@
       </el-form-item>
       <el-form-item label="签约类型">
         <el-radio-group v-model="submitForm.kpSiginType"  v-bind:disabled="editDisabled">
-          <el-radio :label="1" value='1'>法人代表</el-radio>
-          <el-radio :label="2" value='2'>个人</el-radio>
-          <el-radio :label="3" value='3'>代理人</el-radio>
+          <el-radio :label="1" value=1>法人代表</el-radio>
+          <el-radio :label="2" value=2>个人</el-radio>
+          <el-radio :label="3" value=3>代理人</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="代理人授权书">
@@ -127,7 +127,6 @@ export default {
       let self = this
       this.$axios.post('/api/customer/kp/save', this.$qs.stringify(self.submitForm), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -158,7 +157,6 @@ export default {
       console.log(targetUrl)
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -221,7 +219,6 @@ export default {
       formData.append('chunk', '0')
       this.$axios.post('/api/ui/upload', formData, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'multipart/form-data'
         }
       }).then(function (response) {
@@ -261,7 +258,6 @@ export default {
       formData.append('chunk', '0')
       this.$axios.post('/api/ui/upload', formData, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'multipart/form-data'
         }
       }).then(function (response) {

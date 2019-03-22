@@ -172,7 +172,6 @@ export default {
       console.log(targetUrl)
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -222,7 +221,6 @@ export default {
       let params = JSON.stringify(self.submitForm)
       this.$axios.post('/api/customer/contract/save', params, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/json'
         }
       }).then(function (response) {
@@ -256,7 +254,6 @@ export default {
       let customerId = this.customerId
       this.$axios.post('/api/customer/contract/list', this.$qs.stringify({'customerId': customerId}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -284,7 +281,6 @@ export default {
       formData.append('chunk', '0')
       this.$axios.post('/api/ui/upload', formData, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'multipart/form-data'
         }
       }).then(function (response) {

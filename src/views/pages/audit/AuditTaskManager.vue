@@ -127,7 +127,6 @@ export default {
       let self = this
       this.$axios.post('/api/audit/list', this.$qs.stringify(self.searchParam), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -192,6 +191,7 @@ export default {
         console.log(error)
       })
       this.isShowDistributionVisible = false
+      this.distributeParam.transactor = ''
       this.fetchData()
     },
     handleView (row) {

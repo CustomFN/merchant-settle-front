@@ -98,7 +98,6 @@ export default {
       let self = this
       this.$axios.post('/api/customer/save', this.$qs.stringify(self.submitForm), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -130,7 +129,6 @@ export default {
       console.log(targetUrl)
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -170,7 +168,6 @@ export default {
       formData.append('chunk', '0')
       this.$axios.post('/api/ui/upload', formData, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'multipart/form-data'
         }
       }).then(function (response) {

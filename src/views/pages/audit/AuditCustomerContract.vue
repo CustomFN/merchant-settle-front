@@ -78,18 +78,17 @@ export default {
     }
   },
   mounted () {
-    this.taskId = this.auditResult.auditTaskId = this.$store.state.auditTaskId
-    this.opUser = this.$store.state.userId
+    this.auditResult.auditTaskId = this.$store.state.auditTaskId
+    this.auditResult.opUser = this.$cookies.get('user').userId
     this.fetchData()
   },
   methods: {
     fetchData () {
       let self = this
-      let targetUrl = '/api/audit/detail/' + this.taskId
+      let targetUrl = '/api/audit/detail/' + this.auditResult.auditTaskId
       console.log(targetUrl)
       this.$axios.post(targetUrl, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -114,7 +113,6 @@ export default {
       this.auditResult.auditStatus = this.$store.state.auditPassStatus
       this.$axios.post('/api/audit/saveAuditResult', this.$qs.stringify(self.auditResult), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -147,7 +145,6 @@ export default {
         self.auditResult.auditStatus = self.$store.state.auditRejectStatus
         self.$axios.post('/api/audit/saveAuditResult', self.$qs.stringify(self.auditResult), {
           headers: {
-            'Access-Control-Allow-Origin': 'http://127.0.0.1',
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then(function (response) {

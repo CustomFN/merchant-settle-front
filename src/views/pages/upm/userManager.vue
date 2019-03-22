@@ -259,7 +259,6 @@ export default {
       let self = this
       this.$axios.post('/api/user/save', this.$qs.stringify(self.submitForm), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -290,7 +289,6 @@ export default {
       let self = this
       this.$axios.post('/api/user/show', this.$qs.stringify({'userId': row.userId}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -327,7 +325,6 @@ export default {
       let self = this
       this.$axios.post('/api/user/delete', this.$qs.stringify({'userId': userId}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -367,7 +364,6 @@ export default {
       let self = this
       this.$axios.post('/api/user/assignRoles', this.$qs.stringify(self.userRole), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -393,7 +389,6 @@ export default {
       let self = this
       this.$axios.post('/api/role/list', this.$qs.stringify(self.roleSearchParam), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {

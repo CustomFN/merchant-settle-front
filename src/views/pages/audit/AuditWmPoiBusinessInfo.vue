@@ -13,20 +13,23 @@
           <h3>审核信息</h3>
           <div class="">
             <el-table :data="tableData" border style="width:121px">
-              <el-table-column prop="wmPoiId" label="门店ID" width="120px"></el-table-column>
+              <el-table-column prop="auditDataObj.wmPoiId" label="门店ID" width="120px"></el-table-column>
             </el-table>
             <el-table :data="tableData" border style="width: 100%">
-              <el-table-column prop="orderMealDate" label="订餐日期"></el-table-column>
-              <el-table-column prop="orderMealTime" label="订餐时间" width="180px"></el-table-column>
-              <el-table-column prop="orderMealTel" label="订餐电话" width="180px"></el-table-column>
+              <el-table-column prop="auditDataObj.orderMealDate" label="订餐日期"></el-table-column>
+            </el-table>
+            <el-table :data="tableData" border style="width: 100%">
+              <el-table-column prop="auditDataObj.orderMealStartTime" label="订餐开始时间" ></el-table-column>
+              <el-table-column prop="auditDataObj.orderMealEndTime" label="订餐结束时间" ></el-table-column>
+              <el-table-column prop="auditDataObj.orderMealTel" label="订餐电话" ></el-table-column>
             </el-table>
             <div class="container-right-bottom">
               <div>
-                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="textarea"></el-input>
+                <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="auditResult.result"></el-input>
               </div>
               <div class="container-right-bottom-btn">
-                <el-button type="primary">审核通过</el-button>
-                <el-button type="danger">审核驳回</el-button>
+                <el-button type="primary" @click="submitAuditPass()">审核通过</el-button>
+                <el-button type="danger" @click="submitAuditReject()">审核驳回</el-button>
               </div>
             </div>
           </div>
@@ -40,13 +43,101 @@
 export default {
   data () {
     return {
-      textarea: '',
-      tableData: [{
-        wmPoiId: '1',
-        orderMealDate: '周一、周二、周三、周四、周五、周六、周日',
-        orderMealTime: '10:00 - 22:00',
-        orderMealTel: '12345678900'
-      }]
+      tableData: [],
+      auditResult: {
+        auditTaskId: 0,
+        auditStatus: 203,
+        result: '',
+        opUser: ''
+      }
+    }
+  },
+  mounted () {
+    this.auditResult.auditTaskId = this.$store.state.auditTaskId
+    this.auditResult.opUser = this.$cookies.get('user').userId
+    this.fetchData()
+  },
+  methods: {
+    fetchData () {
+      let self = this
+      let targetUrl = '/api/audit/detail/' + this.auditResult.auditTaskId
+      this.$axios.post(targetUrl, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.tableData = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    submitAuditPass () {
+      let self = this
+      this.auditResult.auditStatus = this.$store.state.auditPassStatus
+      this.$axios.post('/api/audit/saveAuditResult', this.$qs.stringify(self.auditResult), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.$message({
+            message: '审核通过',
+            type: 'success'
+          })
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.$router.go(-1)
+    },
+    submitAuditReject () {
+      let self = this
+      if (this.auditResult.result === '') {
+        self.$message({
+          message: '驳回原因必填',
+          type: 'warning'
+        })
+      } else {
+        self.auditResult.auditStatus = self.$store.state.auditRejectStatus
+        self.$axios.post('/api/audit/saveAuditResult', self.$qs.stringify(self.auditResult), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then(function (response) {
+          console.log(response)
+          const _data = response.data
+          if (_data.code === 200) {
+            self.$message({
+              message: '审核驳回',
+              type: 'warning'
+            })
+          } else {
+            self.$message({
+              message: _data.msg,
+              type: 'warning'
+            })
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
+        this.$router.go(-1)
+      }
     }
   }
 }

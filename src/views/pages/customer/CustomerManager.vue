@@ -132,7 +132,6 @@ export default {
       let api = '/api/customer/delete/' + customerId
       this.$axios.post(api, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -162,7 +161,6 @@ export default {
       let self = this
       this.$axios.post('/api/customer/distributePrincipal', this.$qs.stringify(self.distributeParam), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -193,7 +191,6 @@ export default {
       let self = this
       this.$axios.post('/api/customer/list', this.$qs.stringify(self.searchParam), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {

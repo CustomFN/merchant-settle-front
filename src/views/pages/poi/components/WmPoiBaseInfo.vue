@@ -182,7 +182,6 @@ export default {
       console.log(this.submitForm)
       this.$axios.post('/api/wmpoi/baseinfo/save/', this.$qs.stringify(this.submitForm), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -195,6 +194,7 @@ export default {
           })
           self.handleShowWmPoiBaseInfo(_data.data)
           self.handlePhysicalPoiStatus(self.physicalPoiId)
+          self.$store.dispatch('setCustomerIdAction', _data.data.customerId)
         } else {
           self.$message({
             message: _data.msg,
@@ -229,7 +229,6 @@ export default {
       let targetUrl = '/api/wmpoi/baseinfo/show/' + this.wmPoiId
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -286,7 +285,6 @@ export default {
       let targetUrl = '/api/physicalpoi/show/' + this.physicalPoiId
       this.$axios.post(targetUrl, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -322,7 +320,6 @@ export default {
       let self = this
       this.$axios.post('/api/physicalpoi/update', this.$qs.stringify({'physicalPoiId': id}), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
@@ -345,7 +342,6 @@ export default {
       formData.append('chunk', '0')
       this.$axios.post('/api/ui/upload', formData, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'multipart/form-data'
         }
       }).then(function (response) {
@@ -377,7 +373,6 @@ export default {
       formData.append('chunk', '0')
       this.$axios.post('/api/ui/upload', formData, {
         headers: {
-          'Access-Control-Allow-Origin': 'http://127.0.0.1',
           'Content-Type': 'multipart/form-data'
         }
       }).then(function (response) {
