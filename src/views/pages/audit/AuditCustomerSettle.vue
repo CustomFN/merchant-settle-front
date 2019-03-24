@@ -35,6 +35,9 @@
               <el-table-column prop="auditDataObj.settleCycleStr" label="结算周期"></el-table-column>
               <el-table-column prop="auditDataObj.settleMinAmount" label="最低结算金额/元"></el-table-column>
             </el-table>
+            <el-table :data="tableData" border style="width: 100%">
+              <el-table-column prop="auditDataObj.wmPoiIds" label="结算方式"></el-table-column>
+            </el-table>
             <div class="container-right-bottom">
               <div>
                 <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="auditResult.result"></el-input>
