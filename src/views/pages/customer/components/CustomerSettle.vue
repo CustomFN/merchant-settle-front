@@ -47,17 +47,17 @@
         </el-form-item>
         <el-form-item label="开户行">
           <div class="block">
-            <el-select v-model="submitForm.province" placeholder="请选择" v-bind:disabled="editDisabled">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            <el-select v-model="submitForm.province" placeholder="请选择" @change="fetchCity" v-bind:disabled="editDisabled">
+              <el-option v-for="item in provinces" :key="item.provinceId" :label="item.provinceName" :value="item.provinceId"></el-option>
             </el-select>
-            <el-select v-model="submitForm.city" placeholder="请选择" v-bind:disabled="editDisabled">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            <el-select v-model="submitForm.city" placeholder="请选择" @change="fetchBank" v-bind:disabled="editDisabled">
+              <el-option v-for="item in cities" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
             </el-select>
-            <el-select v-model="submitForm.bankId" placeholder="请选择" v-bind:disabled="editDisabled">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            <el-select v-model="submitForm.bankId" placeholder="请选择" @change="fetchSubBank" v-bind:disabled="editDisabled">
+              <el-option v-for="item in banks" :key="item.bankId" :label="item.bankName" :value="item.bankId"></el-option>
             </el-select>
             <el-select v-model="submitForm.branchId" placeholder="请选择" v-bind:disabled="editDisabled">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+              <el-option v-for="item in branches" :key="item.subBankId" :label="item.subBankName" :value="item.subBankId"></el-option>
             </el-select>
           </div>
         </el-form-item>
@@ -98,6 +98,9 @@
         <el-form-item label="最低结算金额/元">
           <el-input v-model="submitForm.settleMinAmount" v-bind:disabled="editDisabled"></el-input>
         </el-form-item>
+        <el-form-item label="关联门店ID">
+          <el-input v-model="submitForm.wmPoiIds" placeholder="多门店ID以英文逗号,分隔" v-bind:disabled="editDisabled"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="onSubmit" v-bind:disabled="editDisabled">保存并提交</el-button>
@@ -136,7 +139,7 @@ export default {
         settleType: 1,
         settleCycle: 1,
         settleMinAmount: '',
-        wmPoiIdList: [1],
+        wmPoiIds: '',
         statusStr: '',
         customerId: this.$store.state.customerId
       },
@@ -147,13 +150,10 @@ export default {
         pageNum: 1,
         pageSize: 10
       },
-      options: [{
-        value: 1,
-        label: '黄金糕'
-      }, {
-        value: 2,
-        label: '双皮奶'
-      }],
+      provinces: [],
+      cities: [],
+      banks: [],
+      branches: [],
       certificatesTypes: [{
         value: 1,
         label: '身份证'
@@ -166,6 +166,7 @@ export default {
   },
   mounted  () {
     this.tempForm = this.submitForm
+    this.fetchProvinces()
     this.customerId = this.$store.state.customerId
     if (this.customerId > 0) {
       this.fetchData()
@@ -269,7 +270,90 @@ export default {
       this.isShowEditVisible = true
     },
     deleteSettle (row) {
-
+    },
+    fetchProvinces () {
+      let self = this
+      this.$axios.post('/api/ui/getProvinces', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.provinces = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchCity (provinceId) {
+      let self = this
+      this.$axios.post('/api/ui/getCities', this.$qs.stringify({'provinceId': provinceId}), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.cities = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchBank (cityId) {
+      let self = this
+      this.$axios.post('/api/ui/getBanks', this.$qs.stringify({'cityId': cityId}), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.banks = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchSubBank (bankId) {
+      let self = this
+      this.$axios.post('/api/ui/getSubBanks', this.$qs.stringify({'bankId': bankId}), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.branches = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
     }
   }
 }

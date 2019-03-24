@@ -17,17 +17,17 @@
         </el-form-item>
         <el-form-item label="开户行">
           <div class="block">
-            <el-select v-model="showForm.province" placeholder="请选择">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            <el-select v-model="showForm.province" placeholder="请选择" @change="fetchCity">
+              <el-option v-for="item in provinces" :key="item.provinceId" :label="item.provinceName" :value="item.provinceId"></el-option>
             </el-select>
-            <el-select v-model="showForm.city" placeholder="请选择">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            <el-select v-model="showForm.city" placeholder="请选择" @change="fetchBank">
+              <el-option v-for="item in cities" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
             </el-select>
-            <el-select v-model="showForm.bankId" placeholder="请选择">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            <el-select v-model="showForm.bankId" placeholder="请选择" @change="fetchSubBank">
+              <el-option v-for="item in banks" :key="item.bankId" :label="item.bankName" :value="item.bankId"></el-option>
             </el-select>
             <el-select v-model="showForm.branchId" placeholder="请选择">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+              <el-option v-for="item in branches" :key="item.subBankId" :label="item.subBankName" :value="item.subBankId"></el-option>
             </el-select>
           </div>
         </el-form-item>
@@ -84,10 +84,10 @@ export default {
         settleAccType: 1,
         settleAccName: '',
         settleAccNo: '',
-        province: 1,
-        city: 2,
-        bankId: 2,
-        branchId: 1,
+        province: '',
+        city: '',
+        bankId: '',
+        branchId: '',
         branchName: '',
         reservePhoneNum: '',
         financialOfficer: '',
@@ -98,13 +98,10 @@ export default {
         settleCycle: 1,
         settleMinAmount: ''
       },
-      options: [{
-        value: 1,
-        label: '黄金糕'
-      }, {
-        value: 2,
-        label: '双皮奶'
-      }],
+      provinces: [],
+      cities: [],
+      banks: [],
+      branches: [],
       certificatesTypes: [{
         value: 1,
         label: '身份证'
@@ -115,7 +112,7 @@ export default {
     }
   },
   mounted () {
-    console.log(this.showForm.wmPoiId)
+    this.fetchProvinces()
     if (this.showForm.wmPoiId != null && this.showForm.wmPoiId > 0) {
       this.fetchData()
     }
@@ -152,6 +149,90 @@ export default {
     },
     handleToCustomerSettle () {
       this.$router.push('/customer/customerinfo')
+    },
+    fetchProvinces () {
+      let self = this
+      this.$axios.post('/api/ui/getProvinces', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.provinces = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchCity (provinceId) {
+      let self = this
+      this.$axios.post('/api/ui/getCities', this.$qs.stringify({'provinceId': provinceId}), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.cities = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchBank (cityId) {
+      let self = this
+      this.$axios.post('/api/ui/getBanks', this.$qs.stringify({'cityId': cityId}), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.banks = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchSubBank (bankId) {
+      let self = this
+      this.$axios.post('/api/ui/getSubBanks', this.$qs.stringify({'bankId': bankId}), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.branches = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
     }
   }
 }

@@ -33,15 +33,15 @@
           </el-form-item>
           <el-form-item label="主营品类">
             <el-select v-model="submitForm.wmPoiCategory" v-bind:disabled="editDisabled">
-              <el-option v-for="item in categories" :key="item.value" :label="item.label" :value="item.value"></el-option>
+              <el-option v-for="item in categories" :key="item.categoryId" :label="item.categoryName" :value="item.categoryId"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="物理城市">
-            <el-select v-model="submitForm.wmPoiCityId" placeholder="请选择" v-bind:disabled="editDisabled">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            <el-select v-model="submitForm.wmPoiCityId" placeholder="请选择" @change="fetchRegion" v-bind:disabled="editDisabled">
+             <el-option v-for="item in cities" :key="item.provinceId" :label="item.provinceName" :value="item.provinceId"></el-option>
             </el-select>
             <el-select v-model="submitForm.wmPoiRegionId" placeholder="请选择" v-bind:disabled="editDisabled">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+              <el-option v-for="item in regions" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="门店地址">
@@ -133,20 +133,9 @@ export default {
         logoList: [],
         environmentPicList: []
       },
-      options: [{
-        value: 1,
-        label: '黄金糕'
-      }, {
-        value: 2,
-        label: '双皮奶'
-      }],
-      categories: [{
-        value: 1,
-        label: '主食/米饭'
-      }, {
-        value: 2,
-        label: '主食/面条'
-      }],
+      cities: [],
+      regions: [],
+      categories: [],
       markers: [
         [121.59996, 31.197646]
       ],
@@ -169,6 +158,8 @@ export default {
     }
   },
   mounted () {
+    this.fetchProvinces()
+    this.fetchCategory()
     let self = this
     if (this.physicalPoiId > 0 && this.wmPoiId <= 0) {
       self.fetchPhysicalPoiInfo()
@@ -428,6 +419,69 @@ export default {
         this.$store.dispatch('setCustomerIdAction', this.submitForm.customerId)
         this.$router.push('/customer/customerinfo')
       }
+    },
+    fetchCategory () {
+      let self = this
+      this.$axios.post('/api/ui/getCategories', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.categories = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchProvinces () {
+      let self = this
+      this.$axios.post('/api/ui/getProvinces', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.cities = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchRegion (provinceId) {
+      let self = this
+      this.$axios.post('/api/ui/getCities', this.$qs.stringify({'provinceId': provinceId}), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.regions = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
     }
   }
 }

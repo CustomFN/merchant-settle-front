@@ -65,8 +65,7 @@
       </el-form-item>
       <el-form-item label="银行">
         <el-select v-model="submitForm.bankId" v-bind:disabled="editDisabled">
-          <el-option label="中国建设银行" value="1"></el-option>
-          <el-option label="中国工商银行" value="2"></el-option>
+          <el-option v-for="item in bankInfo" :key="item.bankId" :label="item.bankName" :value="item.bankId"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="银行卡号">
@@ -102,6 +101,7 @@ export default {
         statusStr: '',
         customerId: this.$store.state.customerId
       },
+      bankInfo: [],
       kpCertificatesTypes: [{
         value: 1,
         label: '身份证'
@@ -117,6 +117,7 @@ export default {
     }
   },
   mounted () {
+    this.fetchBanks()
     if (this.customerId > 0) {
       this.fetchData()
     }
@@ -190,6 +191,28 @@ export default {
               self.editDisabled = true
             }
           }
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchBanks () {
+      console.log(this.submitForm)
+      let self = this
+      this.$axios.post('/api/ui/getBanks', this.$qs.stringify({'cityId': 1101}), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.bankInfo = _data.data
         } else {
           self.$message({
             message: _data.msg,

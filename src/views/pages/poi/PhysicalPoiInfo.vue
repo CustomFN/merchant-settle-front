@@ -1,14 +1,14 @@
 <template>
   <div class="container-core">
     <el-form ref="form" :model="submitForm" label-width="120px" size="medium">
-      <el-form-item label="物理城市">
-        <el-select v-model="submitForm.physicalCityId">
-          <el-option v-for="item in physicalCities" :key="item.value" :label="item.label" :value="item.value"></el-option>
+      <el-form-item label="物理省份">
+        <el-select v-model="submitForm.physicalCityId" @change="fetchRegion">
+          <el-option v-for="item in physicalCities" :key="item.provinceId" :label="item.provinceName" :value="item.provinceId"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="行政区/县">
+      <el-form-item label="物理城市">
         <el-select v-model="submitForm.physicalRegionId">
-          <el-option v-for="item in physicalRegions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          <el-option v-for="item in physicalRegions" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="物理门店名称">
@@ -19,7 +19,7 @@
       </el-form-item>
       <el-form-item label="物理门店品类">
         <el-select v-model="submitForm.physicalPoiCategory">
-          <el-option v-for="item in categories" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          <el-option v-for="item in categories" :key="item.categoryId" :label="item.categoryName" :value="item.categoryId"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="物理门店地址">
@@ -61,27 +61,9 @@ export default {
         physicalPoiLongitude: '',
         physicalPoiLatitude: ''
       },
-      physicalCities: [{
-        value: 1,
-        label: '北京市'
-      }, {
-        value: 2,
-        label: '天津市'
-      }],
-      physicalRegions: [{
-        value: 1,
-        label: '朝阳区'
-      }, {
-        value: 2,
-        label: '海淀区'
-      }],
-      categories: [{
-        value: 1,
-        label: '主食/米饭'
-      }, {
-        value: 2,
-        label: '主食/面条'
-      }],
+      physicalCities: [],
+      physicalRegions: [],
+      categories: [],
       markers: [],
       searchOption: {
         city: '北京',
@@ -99,6 +81,10 @@ export default {
         }
       }
     }
+  },
+  mounted () {
+    this.fetchProvinces()
+    this.fetchCategory()
   },
   methods: {
     onSubmit () {
@@ -148,6 +134,69 @@ export default {
         this.submitForm.physicalPoiLongitude = center.lng
         this.submitForm.physicalPoiLatitude = center.lat
       }
+    },
+    fetchCategory () {
+      let self = this
+      this.$axios.post('/api/ui/getCategories', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.categories = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchProvinces () {
+      let self = this
+      this.$axios.post('/api/ui/getProvinces', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.physicalCities = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    fetchRegion (provinceId) {
+      let self = this
+      this.$axios.post('/api/ui/getCities', this.$qs.stringify({'provinceId': provinceId}), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(function (response) {
+        console.log(response)
+        const _data = response.data
+        if (_data.code === 200) {
+          self.physicalRegions = _data.data
+        } else {
+          self.$message({
+            message: _data.msg,
+            type: 'warning'
+          })
+        }
+      }).catch(function (error) {
+        console.log(error)
+      })
     }
   }
 }

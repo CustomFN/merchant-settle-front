@@ -104,9 +104,9 @@ export default {
     handleShowAuditTask (data) {
       this.tableData = data
       let area = data[0].auditDataObj.wmPoiProjectList[0].deliveryArea[0]
-      // let mapPosition = [Number(area[0]), Number(area[1])]
-      // this.mapCenter = this.circles[0].center = mapPosition
-      // this.markers.push(mapPosition)
+      let mapPosition = [Number(area[0]), Number(area[1])]
+      this.mapCenter = this.circles[0].center = mapPosition
+      this.markers.push(mapPosition)
     },
     submitAuditPass () {
       let self = this
