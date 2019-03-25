@@ -65,8 +65,11 @@ export default {
     }
   },
   mounted () {
-    if (this.submitForm.id != null && this.submitForm.id > 0) {
-      this.fetchData()
+    let user = this.$cookies.get('user')
+    if (user != null) {
+      if (this.submitForm.id != null && this.submitForm.id > 0) {
+        this.fetchData()
+      }
     }
   },
   methods: {

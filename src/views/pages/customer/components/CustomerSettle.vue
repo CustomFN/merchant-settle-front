@@ -165,12 +165,16 @@ export default {
     }
   },
   mounted  () {
-    this.tempForm = this.submitForm
-    this.fetchProvinces()
-    this.customerId = this.$store.state.customerId
-    if (this.customerId > 0) {
-      this.fetchData()
+    let user = this.$cookies.get('user')
+    if (user != null) {
+      this.tempForm = this.submitForm
+      this.fetchProvinces()
+      this.customerId = this.$store.state.customerId
+      if (this.customerId > 0) {
+        this.fetchData()
+      }
     }
+    
   },
   methods: {
     onSubmit () {

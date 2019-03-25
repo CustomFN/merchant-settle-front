@@ -73,8 +73,13 @@ export default {
     }
   },
   mounted () {
-    this.searchParam.wmPoiId = this.$store.state.wmPoiId
-    this.fetchData()
+    let user = this.$cookies.get('user')
+    if (user == null) {
+      this.$router.push('/login')
+    } else {
+      this.searchParam.wmPoiId = this.$store.state.wmPoiId
+      this.fetchData()
+    }
   },
   methods: {
     fetchData () {

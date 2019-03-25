@@ -28,6 +28,12 @@ export default {
     CustomerContract,
     CustomerSettle
   },
+  mounted () {
+    let user = this.$cookies.get('user')
+    if (user == null) {
+      this.$router.push('/login')
+    }
+  },
   data () {
     return {
       activeName: 'customerBaseInfo',

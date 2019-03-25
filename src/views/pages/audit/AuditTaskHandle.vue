@@ -98,8 +98,12 @@ export default {
   },
   mounted () {
     let user = this.$cookies.get('user')
-    this.searchParam.transactor = user.userId
-    this.fetchData()
+    if (user == null) {
+      this.$router.push('/login')
+    } else {
+      this.searchParam.transactor = user.userId
+      this.fetchData()
+    }
   },
   methods: {
     fetchData () {

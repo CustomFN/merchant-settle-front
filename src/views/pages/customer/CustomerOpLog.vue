@@ -73,8 +73,13 @@ export default {
     }
   },
   mounted () {
-    this.searchParam.customerId = this.$store.state.customerId
-    this.fetchData()
+    let user = this.$cookies.get('user')
+    if (user == null) {
+      this.$router.push('/login')
+    } else {
+      this.searchParam.customerId = this.$store.state.customerId
+      this.fetchData()
+    }
   },
   methods: {
     fetchData () {

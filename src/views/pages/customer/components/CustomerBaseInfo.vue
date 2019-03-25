@@ -86,8 +86,11 @@ export default {
     }
   },
   mounted () {
-    if (this.customerId > 0) {
-      this.fetchData()
+    let user = this.$cookies.get('user')
+    if (user != null) {
+      if (this.customerId > 0) {
+        this.fetchData()
+      }
     }
   },
   methods: {

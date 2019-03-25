@@ -83,8 +83,13 @@ export default {
     }
   },
   mounted () {
-    this.fetchProvinces()
-    this.fetchCategory()
+    let user = this.$cookies.get('user')
+    if (user == null) {
+      this.$router.push('/login')
+    } else {
+      this.fetchProvinces()
+      this.fetchCategory()
+    }
   },
   methods: {
     onSubmit () {

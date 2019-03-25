@@ -112,9 +112,12 @@ export default {
     }
   },
   mounted () {
-    this.fetchProvinces()
-    if (this.showForm.wmPoiId != null && this.showForm.wmPoiId > 0) {
-      this.fetchData()
+    let user = this.$cookies.get('user')
+    if (user != null) {
+      this.fetchProvinces()
+      if (this.showForm.wmPoiId != null && this.showForm.wmPoiId > 0) {
+        this.fetchData()
+      }
     }
   },
   methods: {

@@ -95,7 +95,12 @@ export default {
     }
   },
   mounted () {
-    this.fetchData()
+    let user = this.$cookies.get('user')
+    if (user == null) {
+      this.$router.push('/login')
+    } else {
+      this.fetchData()
+    }
   },
   methods: {
     fetchData () {

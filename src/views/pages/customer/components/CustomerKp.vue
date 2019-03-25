@@ -117,9 +117,12 @@ export default {
     }
   },
   mounted () {
-    this.fetchBanks()
-    if (this.customerId > 0) {
-      this.fetchData()
+    let user = this.$cookies.get('user')
+    if (user != null) {
+      this.fetchBanks()
+      if (this.customerId > 0) {
+        this.fetchData()
+      }
     }
   },
   methods: {

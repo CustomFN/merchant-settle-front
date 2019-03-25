@@ -152,8 +152,11 @@ export default {
     }
   },
   mounted () {
-    if (this.submitForm.wmPoiId != null && this.submitForm.wmPoiId > 0) {
-      this.fetchData()
+    let user = this.$cookies.get('user')
+    if (user != null) {
+      if (this.submitForm.wmPoiId != null && this.submitForm.wmPoiId > 0) {
+        this.fetchData()
+      }
     }
   },
   methods: {

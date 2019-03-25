@@ -33,6 +33,12 @@ export default {
     WmPoiSettleInfo,
     WmPoiBusinessInfo
   },
+  mounted () {
+    let user = this.$cookies.get('user')
+    if (user == null) {
+      this.$router.push('/login')
+    }
+  },
   data () {
     return {
       activeName: '1'

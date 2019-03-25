@@ -173,8 +173,13 @@ export default {
       pageSize: 10
     }
   },
-  created () {
-    this.fetchData()
+  mounted () {
+    let user = this.$cookies.get('user')
+    if (user == null) {
+      this.$router.push('/login')
+    } else {
+      this.fetchData()
+    }
   },
   methods: {
     fetchData () {

@@ -158,13 +158,16 @@ export default {
     }
   },
   mounted () {
-    this.fetchProvinces()
-    this.fetchCategory()
-    let self = this
-    if (this.physicalPoiId > 0 && this.wmPoiId <= 0) {
-      self.fetchPhysicalPoiInfo()
-    } else if (this.wmPoiId > 0) {
-      self.fetchData()
+    let user = this.$cookies.get('user')
+    if (user != null) {
+      this.fetchProvinces()
+      this.fetchCategory()
+      let self = this
+      if (this.physicalPoiId > 0 && this.wmPoiId <= 0) {
+        self.fetchPhysicalPoiInfo()
+      } else if (this.wmPoiId > 0) {
+        self.fetchData()
+      }
     }
   },
   methods: {

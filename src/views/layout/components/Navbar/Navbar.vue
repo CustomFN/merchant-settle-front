@@ -34,7 +34,9 @@ export default {
   },
   mounted () {
     let user = this.$cookies.get('user')
-    this.userName = user.userName
+    if (user != null) {
+      this.userName = user.userName
+    }
   },
   data () {
     return {
