@@ -14,11 +14,9 @@ export const constantRouterMap = [
     name: 'Dashboard',
     hidden: true,
     children: [{
-      path: 'dashboard'
-    }],
-    meta: {
-      requireLogin: true
-    }
+      path: 'dashboard',
+      component: () => import('@/components/Dashboard/Dashboard')
+    }]
   },
 
   {
