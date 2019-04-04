@@ -75,7 +75,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response.data)
         const _data = response.data
         if (_data.code === 200) {
           self.$cookies.set('user', _data.data)

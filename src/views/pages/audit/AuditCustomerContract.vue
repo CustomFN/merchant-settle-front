@@ -91,13 +91,11 @@ export default {
     fetchData () {
       let self = this
       let targetUrl = '/api/audit/detail/' + this.auditResult.auditTaskId
-      console.log(targetUrl)
       this.$axios.post(targetUrl, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.tableData = _data.data
@@ -121,7 +119,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -153,7 +150,6 @@ export default {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then(function (response) {
-          console.log(response)
           const _data = response.data
           if (_data.code === 200) {
             self.$message({

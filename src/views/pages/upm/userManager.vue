@@ -178,7 +178,7 @@
       <span>确认删除 {{this.deleteParam.userName}}({{ this.deleteParam.userId }}) 吗</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="deleteVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitDelete(this.deleteParam.userId)">确 定</el-button>
+        <el-button type="primary" @click="submitDelete(deleteParam.userId)">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -364,7 +364,6 @@ export default {
     },
     saveUserRole () {
       this.userRole.roleIdList = this.$refs.tree.getCheckedKeys()
-      console.log(this.userRole.roleIdList)
 
       let self = this
       this.$axios.post('/api/user/assignRoles', this.$qs.stringify(self.userRole), {
@@ -390,14 +389,12 @@ export default {
       this.isShowRoleVisible = false
     },
     fetchRoleData () {
-      console.log(this.roleSearchParam)
       let self = this
       this.$axios.post('/api/role/list', this.$qs.stringify(self.roleSearchParam), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.rolesTree = _data.data.data
@@ -415,7 +412,6 @@ export default {
       })
     },
     fetchData () {
-      console.log(this.searchParam)
       let self = this
       this.$axios.post('/api/user/list', this.$qs.stringify(self.searchParam), {
         headers: {
@@ -423,7 +419,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.tableList = _data.data.data
@@ -451,12 +446,10 @@ export default {
     },
     handleSizeChange (val) {
       this.searchParam.pageNum = val
-      console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
       this.searchParam.pageNum = val
-      console.log(this.page)
       this.fetchData()
     },
     handleSearchSizeChange (val) {

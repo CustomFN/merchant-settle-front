@@ -334,7 +334,6 @@ export default {
     },
     saveRoleResource () {
       this.roleResource.resourceIdList = this.$refs.tree.getCheckedKeys()
-      console.log(this.roleResource)
 
       let self = this
       this.$axios.post('/api/role/assignResources', this.$qs.stringify(self.roleResource), {
@@ -342,7 +341,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -361,14 +359,12 @@ export default {
       this.isShowResourceVisible = false
     },
     fetchData () {
-      console.log(this.searchParam)
       let self = this
       this.$axios.post('/api/role/list', this.$qs.stringify(self.searchParam), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.tableList = _data.data.data
@@ -392,7 +388,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.resourcesTree = _data.data
@@ -414,12 +409,10 @@ export default {
     },
     handleSizeChange (val) {
       this.searchParam.pageNum = val
-      console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
       this.searchParam.pageNum = val
-      console.log(this.page)
       this.fetchData()
     }
   }

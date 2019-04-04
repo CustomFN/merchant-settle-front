@@ -173,13 +173,11 @@ export default {
   methods: {
     onSubmit () {
       let self = this
-      console.log(this.submitForm)
       this.$axios.post('/api/wmpoi/baseinfo/save/', this.$qs.stringify(this.submitForm), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -226,7 +224,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           if (_data.data != null) {
@@ -430,7 +427,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.categories = _data.data
@@ -451,7 +447,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.cities = _data.data
@@ -472,7 +467,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.regions = _data.data

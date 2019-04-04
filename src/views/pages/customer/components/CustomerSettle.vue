@@ -178,15 +178,12 @@ export default {
   },
   methods: {
     onSubmit () {
-      console.log(this.customerId)
-      console.log(this.submitForm)
       let self = this
       this.$axios.post('/api/customer/settle/save', this.$qs.stringify(self.submitForm), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -215,7 +212,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.tableData = _data.data.data
@@ -234,24 +230,20 @@ export default {
     },
     handleSizeChange (val) {
       this.page = val
-      console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
       this.page = val
-      console.log(this.page)
       this.fetchData()
     },
     editSettle (row) {
       let self = this
       let targetUrl = '/api/customer/settle/show/' + row.id
-      console.log(targetUrl)
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.submitForm = _data.data
@@ -282,7 +274,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.provinces = _data.data
@@ -303,7 +294,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.cities = _data.data
@@ -324,7 +314,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.banks = _data.data
@@ -345,7 +334,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.branches = _data.data

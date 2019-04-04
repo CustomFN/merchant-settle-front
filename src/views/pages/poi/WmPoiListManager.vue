@@ -104,14 +104,12 @@ export default {
   },
   methods: {
     fetchData () {
-      console.log(this.searchParam)
       let self = this
       this.$axios.post('/api/wmpoi/list', this.$qs.stringify(self.searchParam), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.tableData = _data.data.data
@@ -144,14 +142,12 @@ export default {
       this.distributeParam.wmPoiId = row.wmPoiId
     },
     submitDistribution () {
-      console.log(this.distributeParam)
       let self = this
       this.$axios.post('/api/wmpoi/distributePrincipal', this.$qs.stringify(self.distributeParam), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({

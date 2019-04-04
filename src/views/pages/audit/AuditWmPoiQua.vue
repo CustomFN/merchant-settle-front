@@ -90,7 +90,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.handleShowAuditTask(_data.data)
@@ -107,11 +106,11 @@ export default {
     handleShowAuditTask (data) {
       this.tableData = data
 
-      // let images = data[0].auditDataObj.wmPoiLinkManIDCardPic
-      // self.image_1 = images[0]
-      // self.image_2 = images[1]
-      // images = data[0].auditDataObj.wmPoiBusinessLicencePic
-      // self.image_3 = images[0]
+      let images = data[0].auditDataObj.wmPoiLinkManIDCardPic
+      self.image_1 = images[0]
+      self.image_2 = images[1]
+      images = data[0].auditDataObj.wmPoiBusinessLicencePic
+      self.image_3 = images[0]
     },
     submitAuditPass () {
       let self = this
@@ -121,7 +120,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -153,7 +151,6 @@ export default {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then(function (response) {
-          console.log(response)
           const _data = response.data
           if (_data.code === 200) {
             self.$message({

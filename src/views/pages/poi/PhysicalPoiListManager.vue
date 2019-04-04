@@ -78,14 +78,12 @@ export default {
   },
   methods: {
     fetchData () {
-      console.log(this.searchParam)
       let self = this
       this.$axios.post('/api/physicalpoi/listall', this.$qs.stringify(self.searchParam), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.tableData = _data.data.data
@@ -113,7 +111,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({

@@ -127,14 +127,12 @@ export default {
   },
   methods: {
     onSubmit () {
-      console.log(this.submitForm)
       let self = this
       this.$axios.post('/api/customer/kp/save', this.$qs.stringify(self.submitForm), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -158,13 +156,11 @@ export default {
     fetchData () {
       let self = this
       let targetUrl = '/api/customer/kp/show/' + this.customerId
-      console.log(targetUrl)
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           if (_data.data != null) {
@@ -205,14 +201,12 @@ export default {
       })
     },
     fetchBanks () {
-      console.log(this.submitForm)
       let self = this
       this.$axios.post('/api/ui/getBanks', this.$qs.stringify({'cityId': 1101}), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.bankInfo = _data.data

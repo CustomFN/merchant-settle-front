@@ -93,14 +93,12 @@ export default {
   },
   methods: {
     onSubmit () {
-      console.log(this.submitForm)
       let self = this
       this.$axios.post('/api/physicalpoi/save', this.$qs.stringify(self.submitForm), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -147,7 +145,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.categories = _data.data
@@ -168,7 +165,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.physicalCities = _data.data
@@ -189,7 +185,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.physicalRegions = _data.data

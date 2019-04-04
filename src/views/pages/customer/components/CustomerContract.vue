@@ -172,13 +172,11 @@ export default {
     editContract (row) {
       let self = this
       let targetUrl = '/api/customer/contract/show/' + row.contractId
-      console.log(targetUrl)
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 0}), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.submitForm = _data.data
@@ -219,7 +217,6 @@ export default {
       this.submitForm.contractEndTime = unixtime
       this.submitForm.partyA.signTime = unixtimeA
       this.submitForm.partyB.signTime = unixtimeB
-      console.log(this.submitForm)
       let self = this
       let params = JSON.stringify(self.submitForm)
       this.$axios.post('/api/customer/contract/save', params, {
@@ -227,7 +224,6 @@ export default {
           'Content-Type': 'application/json'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -260,7 +256,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.tableData = _data.data.data
@@ -289,7 +284,6 @@ export default {
       }).then(function (response) {
         const _data = response.data
         if (_data.code === 200) {
-          console.log(_data.data)
           let length = _data.data.length
           let index = _data.data.lastIndexOf('-')
           let _name = _data.data.substring(index + 1, length)
@@ -331,12 +325,10 @@ export default {
     },
     handleSizeChange (val) {
       this.page = val
-      console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
       this.page = val
-      console.log(this.page)
       this.fetchData()
     },
     currentChangePage (list) {

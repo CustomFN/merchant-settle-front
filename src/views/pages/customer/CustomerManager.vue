@@ -162,14 +162,12 @@ export default {
       this.distributeParam.customerId = row.customerId
     },
     submitDistribution () {
-      console.log(this.distributeParam)
       let self = this
       this.$axios.post('/api/customer/distributePrincipal', this.$qs.stringify(self.distributeParam), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -192,14 +190,12 @@ export default {
       this.$router.push('/customer/customeroplog')
     },
     fetchData () {
-      console.log(this.searchParam)
       let self = this
       this.$axios.post('/api/customer/list', this.$qs.stringify(self.searchParam), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.tableData = _data.data.data
@@ -221,12 +217,10 @@ export default {
     },
     handleSizeChange (val) {
       this.searchParam.pageNum = val
-      console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
       this.searchParam.pageNum = val
-      console.log(this.page)
       this.fetchData()
     }
   }

@@ -102,7 +102,6 @@ export default {
           'Content-Type': 'application/json'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -121,7 +120,6 @@ export default {
       })
     },
     handleShowWmPoiDeliveryInfo (data) {
-      console.log(data)
       this.submitForm = data
       if (data.status === 412) {
         this.editDisabled = true
@@ -135,7 +133,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           if (_data.data != null) {
@@ -160,7 +157,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           if (_data.data != null) {

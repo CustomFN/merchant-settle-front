@@ -124,13 +124,11 @@ export default {
     fetchData () {
       let self = this
       let targetUrl = '/api/customer/settle/show/' + this.showForm.wmPoiId
-      console.log(targetUrl)
       this.$axios.post(targetUrl, this.$qs.stringify({'effective': 1}), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           if (_data.data != null) {
@@ -160,7 +158,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.provinces = _data.data
@@ -181,7 +178,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.cities = _data.data
@@ -202,7 +198,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.banks = _data.data
@@ -223,7 +218,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.branches = _data.data

@@ -189,7 +189,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.tableData = _data.data.data
@@ -214,7 +213,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.showViewForm = _data.data
@@ -250,12 +248,10 @@ export default {
     },
     handleSizeChange (val) {
       this.page = val
-      console.log(this.page)
       this.fetchData()
     },
     handleCurrentChange (val) {
       this.page = val
-      console.log(this.page)
       this.fetchData()
     },
     doFilter () {

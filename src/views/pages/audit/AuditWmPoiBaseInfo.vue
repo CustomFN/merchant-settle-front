@@ -102,7 +102,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.handleShowAuditTask(_data.data)
@@ -119,10 +118,10 @@ export default {
     handleShowAuditTask (data) {
       this.tableData = data
 
-      // let images = data[0].auditDataObj.wmPoiLogoList
-      // self.image_1 = images[0]
-      // images = data[0].auditDataObj.wmPoiEnvironmentPicList
-      // self.image_2 = images[0]
+      let images = data[0].auditDataObj.wmPoiLogoList
+      self.image_1 = images[0]
+      images = data[0].auditDataObj.wmPoiEnvironmentPicList
+      self.image_2 = images[0]
 
       let mapPosition = [Number(data[0].auditDataObj.wmPoiLongitude), Number(data[0].auditDataObj.wmPoiLatitude)]
       this.mapCenter = mapPosition
@@ -136,7 +135,6 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function (response) {
-        console.log(response)
         const _data = response.data
         if (_data.code === 200) {
           self.$message({
@@ -168,7 +166,6 @@ export default {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then(function (response) {
-          console.log(response)
           const _data = response.data
           if (_data.code === 200) {
             self.$message({
