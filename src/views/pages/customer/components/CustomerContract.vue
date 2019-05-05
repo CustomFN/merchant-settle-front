@@ -136,7 +136,7 @@ export default {
         customerId: this.$store.state.customerId,
         partyA: {
           signerLabel: 'A',
-          party: '朱家琨',
+          party: '',
           partyContactPerson: '',
           partyContactPersonPhone: '',
           signTime: ''
@@ -162,6 +162,7 @@ export default {
   mounted  () {
     let user = this.$cookies.get('user')
     if (user != null) {
+      this.submitForm.partyA.party = user.userName
       this.tempForm = this.submitForm
       if (this.customerId > 0) {
         this.fetchData()

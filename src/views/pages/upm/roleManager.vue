@@ -65,7 +65,7 @@
     </el-pagination>
 
     <!-- 新增角色 -->
-    <el-dialog title="Edit" :visible.sync="isShowAddVisible">
+    <el-dialog title="创建角色" :visible.sync="isShowAddVisible">
       <el-form label-width="80px" :model="submitForm">
         <el-form-item label="角色名称">
           <el-input v-model="submitForm.roleName"></el-input>
@@ -90,7 +90,7 @@
     </el-dialog>
 
     <!-- 编辑角色 -->
-    <el-dialog title="Edit" :visible.sync="isShowEditVisible">
+    <el-dialog title="编辑角色" :visible.sync="isShowEditVisible">
       <el-form label-width="80px" :model="submitForm">
         <el-form-item label="角色ID">
           <el-input v-model="submitForm.roleId" disabled></el-input>
@@ -121,7 +121,7 @@
     </el-dialog>
 
     <!-- 角色资源 -->
-    <el-dialog title="RoleResource" :visible.sync="isShowResourceVisible">
+    <el-dialog title="角色资源分配" :visible.sync="isShowResourceVisible">
       <el-form label-width="80px" :model="roleResource">
         <el-form-item label="角色ID">
           <el-input v-model="roleResource.roleId" disabled></el-input>

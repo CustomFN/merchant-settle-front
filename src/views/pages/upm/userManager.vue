@@ -125,7 +125,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="UserRole" :visible.sync="isShowRoleVisible">
+    <el-dialog title="用户角色分配" :visible.sync="isShowRoleVisible">
       <el-form label-width="80px" :model="userRole">
         <el-form-item label="用户ID">
           <el-input v-model="userRole.userId" disabled></el-input>
