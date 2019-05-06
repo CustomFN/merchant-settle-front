@@ -105,9 +105,6 @@ export default {
             message: '保存成功',
             type: 'success'
           })
-          if (_data.data.status === 1) {
-            self.editDisabled = true
-          }
         } else {
           self.$message({
             message: _data.msg,

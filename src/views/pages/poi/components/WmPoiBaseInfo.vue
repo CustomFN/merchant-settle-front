@@ -187,6 +187,7 @@ export default {
           self.handleShowWmPoiBaseInfo(_data.data)
           self.handlePhysicalPoiStatus(self.physicalPoiId)
           self.$store.dispatch('setCustomerIdAction', _data.data.customerId)
+          self.$store.dispatch('setWmPoiIdAction', _data.data.id)
         } else {
           self.$message({
             message: _data.msg,
@@ -227,6 +228,7 @@ export default {
         const _data = response.data
         if (_data.code === 200) {
           if (_data.data != null) {
+            self.$store.dispatch('setCustomerIdAction', _data.data.customerId)
             self.handleShowWmPoiBaseInfo(_data.data)
           }
         } else {

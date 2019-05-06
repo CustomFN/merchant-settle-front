@@ -74,7 +74,7 @@
           <el-input v-model="submitForm.partyA.partyContactPersonPhone" v-bind:disabled="editDisabled"></el-input>
         </el-form-item>
         <el-form-item label="甲方签约时间">
-          <el-input :value="submitForm.partyA.signTime | dateformat" v-bind:disabled="editDisabled"></el-input>
+          <el-input v-model="submitForm.partyA.signTime" v-bind:disabled="editDisabled"></el-input>
         </el-form-item>
         <el-form-item label="乙方">
           <el-input v-model="submitForm.partyB.party" disabled></el-input>
@@ -86,7 +86,7 @@
           <el-input v-model="submitForm.partyB.partyContactPersonPhone" v-bind:disabled="editDisabled"></el-input>
         </el-form-item>
         <el-form-item label="乙方签约时间">
-          <el-input :value="submitForm.partyB.signTime | dateformat" v-bind:disabled="editDisabled"></el-input>
+          <el-input v-model="submitForm.partyB.signTime" v-bind:disabled="editDisabled"></el-input>
         </el-form-item>
         <el-form-item label="合同扫描件">
           <el-upload class="avatar-uploader"
@@ -97,7 +97,7 @@
             :on-remove="handlePicRemove"
             :before-upload="beforeAvatarUpload"
             :show-file-list="true"
-            :file-list="submitForm.contractScanList"
+            :file-list="tmpForm.contractScanList"
             multiple>
             <i class="el-icon-plus"></i>
           </el-upload>
@@ -128,6 +128,9 @@ export default {
       pageSize: 10,
       isShowEditVisible: false,
       tempForm: {},
+      tmpForm: {
+        contractScanList: []
+      },
       submitForm: {
         customerContractType: '',
         customerContractNum: '',
@@ -163,7 +166,7 @@ export default {
     let user = this.$cookies.get('user')
     if (user != null) {
       this.submitForm.partyA.party = user.userName
-      this.tempForm = this.submitForm
+      this.tempForm = JSON.parse(JSON.stringify(this.submitForm))
       if (this.customerId > 0) {
         this.fetchData()
       }
@@ -181,7 +184,9 @@ export default {
         const _data = response.data
         if (_data.code === 200) {
           self.submitForm = _data.data
-          self.submitForm.contractEndTime = self.submitForm.contractEndTime * 1000
+          self.submitForm.contractEndTime = self.$moment(self.submitForm.contractEndTime * 1000).format('YYYY-MM-DD')
+          self.submitForm.partyA.signTime = self.$moment(self.submitForm.partyA.signTime * 1000).format('YYYY-MM-DD')
+          self.submitForm.partyB.signTime = self.$moment(self.submitForm.partyB.signTime * 1000).format('YYYY-MM-DD')
 
           if (_data.data.contractScanList != null) {
             let picList = _data.data.contractScanList
@@ -189,9 +194,9 @@ export default {
             for (let i = 0; i < picList.length; i++) {
               list.push({name: 'name' + i, url: picList[i]})
             }
-            self.submitForm.contractScanList = list
+            self.tmpForm.contractScanList = list
           } else {
-            self.submitForm.contractScanList = []
+            self.tmpForm.contractScanList = self.submitForm.contractScanList = []
           }
 
           if (_data.data.status === 1) {
@@ -288,7 +293,8 @@ export default {
           let length = _data.data.length
           let index = _data.data.lastIndexOf('-')
           let _name = _data.data.substring(index + 1, length)
-          self.submitForm.contractScanList.push({name: _name, url: _data.data})
+          self.tmpForm.contractScanList.push({name: _name, url: _data.data})
+          self.submitForm.contractScanList.push(_data.data)
           self.$message({
             message: '上传成功',
             type: 'success'
@@ -317,7 +323,8 @@ export default {
     },
     handlePicRemove (file, fileList) {
       let fileUrl = file.url.slice(5, -1)
-      let index = this.submitForm.contractScanList.indexOf(fileUrl, 0)
+      let index = this.tmpForm.contractScanList.indexOf(fileUrl, 0)
+      this.tmpForm.contractScanList.splice(index, 1)
       this.submitForm.contractScanList.splice(index, 1)
     },
     handlePicCardPreview (file) {
@@ -343,7 +350,7 @@ export default {
       }
     },
     addPaperContract () {
-      this.submitForm = this.tempForm
+      this.submitForm = JSON.parse(JSON.stringify(this.tempForm))
       this.isShowEditVisible = true
     }
   }

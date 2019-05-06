@@ -23,7 +23,7 @@
             :on-remove="handlePicRemove"
             :before-upload="beforeAvatarUpload"
             :show-file-list="true"
-            :file-list="submitForm.customerCertificatesPicList"
+            :file-list="tmpForm.customerCertificatesPicList"
             multiple>
             <i class="el-icon-plus"></i>
           </el-upload>
@@ -64,6 +64,9 @@ export default {
       isShowPicDialogVisible: false,
       dialogImageUrl: '',
       customerId: this.$store.state.customerId,
+      tmpForm: {
+        customerCertificatesPicList: []
+      },
       submitForm: {
         id: '',
         customerType: '',
@@ -99,6 +102,7 @@ export default {
       let unixtime = this.$moment(validTime).format('X')
       this.submitForm.customerValidTime = unixtime
       let self = this
+      console.log(self.submitForm)
       this.$axios.post('/api/customer/save', this.$qs.stringify(self.submitForm), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -111,6 +115,7 @@ export default {
             type: 'success'
           })
           self.submitForm = _data.data
+          self.$store.dispatch('setCustomerIdAction', self.submitForm.customerId)
           if (_data.data.status === 1) {
             self.editDisabled = true
           }
@@ -143,9 +148,9 @@ export default {
             for (let i = 0; i < picList.length; i++) {
               list.push({name: 'name' + i, url: picList[i]})
             }
-            self.submitForm.customerCertificatesPicList = list
+            self.tmpForm.customerCertificatesPicList = list
           } else {
-            self.submitForm.customerCertificatesPicList = []
+            self.tmpForm.customerCertificatesPicList = self.submitForm.customerCertificatesPicList = []
           }
 
           if (_data.data.status === 1) {
@@ -176,7 +181,8 @@ export default {
           let length = _data.data.length
           let index = _data.data.lastIndexOf('-')
           let _name = _data.data.substring(index + 1, length)
-          self.submitForm.customerCertificatesPicList.push({name: _name, url: _data.data})
+          self.tmpForm.customerCertificatesPicList.push({name: _name, url: _data.data})
+          self.submitForm.customerCertificatesPicList.push(_data.data)
           self.$message({
             message: '上传成功',
             type: 'success'
@@ -205,7 +211,8 @@ export default {
     },
     handlePicRemove (file, fileList) {
       let fileUrl = file.url.slice(5, -1)
-      let index = this.submitForm.customerCertificatesPicList.indexOf(fileUrl, 0)
+      let index = this.tmpForm.customerCertificatesPicList.indexOf(fileUrl, 0)
+      this.tmpForm.customerCertificatesPicList.splice(index, 1)
       this.submitForm.customerCertificatesPicList.splice(index, 1)
     },
     handlePicCardPreview (file) {

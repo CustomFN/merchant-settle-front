@@ -7,7 +7,7 @@ y<template>
             <el-input placeholder="物理城市" v-model="searchParam.physicalCityId"></el-input>
           </el-form-item>
           <el-form-item >
-            <el-input placeholder="物理门店ID" v-model="searchParam.physicalPoiId"></el-input>
+            <el-input placeholder="物理门店ID" v-model="searchParam.id"></el-input>
           </el-form-item>
           <el-form-item >
             <el-input placeholder="物理门店名称" v-model="searchParam.physicalPoiName"></el-input>
@@ -24,7 +24,7 @@ y<template>
       </div>
       <div class="container-footer-bottom">
         <el-table :data="tableData" border style="width: 100%">
-          <el-table-column prop="physicalCityId" label="物理门店ID" width="150"></el-table-column>
+          <el-table-column prop="id" label="物理门店ID" width="150"></el-table-column>
           <el-table-column prop="physicalPoiName" label="物理门店名称"></el-table-column>
           <el-table-column prop="physicalPoiPhone" label="店内电话" width="200"></el-table-column>
           <el-table-column prop="physicalPoiAddress" label="地址"></el-table-column>
@@ -55,7 +55,7 @@ export default {
   data () {
     return {
       searchParam: {
-        physicalPoiId: '',
+        id: '',
         physicalCityId: '',
         physicalPoiName: '',
         claimed: 0,
@@ -105,7 +105,7 @@ export default {
     },
     claimphysicalPoi (row) {
       let self = this
-      let api = '/api/physicalpoi/claim/' + row.physicalCityId
+      let api = '/api/physicalpoi/claim/' + row.id
       this.$axios.post(api, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'

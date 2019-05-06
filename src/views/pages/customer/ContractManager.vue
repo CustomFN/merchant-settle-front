@@ -216,6 +216,9 @@ export default {
         const _data = response.data
         if (_data.code === 200) {
           self.showViewForm = _data.data
+          self.showViewForm.contractEndTime = self.$moment(self.showViewForm.contractEndTime * 1000).format('YYYY-MM-DD')
+          self.showViewForm.partyA.signTime = self.$moment(self.showViewForm.partyA.signTime * 1000).format('YYYY-MM-DD')
+          self.showViewForm.partyB.signTime = self.$moment(self.showViewForm.partyB.signTime * 1000).format('YYYY-MM-DD')
 
           if (_data.data.contractScanList != null) {
             let picList = _data.data.contractScanList

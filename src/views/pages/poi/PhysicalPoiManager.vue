@@ -7,7 +7,7 @@ y<template>
             <el-input placeholder="物理城市" v-model="searchParam.physicalCityId"></el-input>
           </el-form-item>
           <el-form-item >
-            <el-input placeholder="物理门店ID" v-model="searchParam.physicalPoiId"></el-input>
+            <el-input placeholder="物理门店ID" v-model="searchParam.id"></el-input>
           </el-form-item>
           <el-form-item >
             <el-input placeholder="物理门店名称" v-model="searchParam.physicalPoiName"></el-input>
@@ -52,7 +52,7 @@ export default {
   data () {
     return {
       searchParam: {
-        physicalPoiId: '',
+        id: '',
         physicalCityId: '',
         physicalPoiName: '',
         claimed: 1,
@@ -102,6 +102,7 @@ export default {
     },
     handleCooperate (row) {
       this.$store.dispatch('setPhysicalPoiIdAction', row.id)
+      this.$store.dispatch('setWmPoiIdAction', 0)
       this.$router.push('/poi/wmpoiinfo')
     },
     handleSizeChange (val) {

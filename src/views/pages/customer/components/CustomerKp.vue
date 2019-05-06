@@ -27,7 +27,7 @@
           :on-remove="handleAuthorPicRemove"
           :before-upload="beforeAvatarUpload"
           :show-file-list="true"
-          :file-list="submitForm.kpAuthorizationPicList"
+          :file-list="tmpForm.kpAuthorizationPicList"
           multiple>
           <i class="el-icon-plus"></i>
         </el-upload>
@@ -41,7 +41,7 @@
           :on-remove="handleCertiPicRemove"
           :before-upload="beforeAvatarUpload"
           :show-file-list="true"
-          :file-list="submitForm.kpCertificatesPicList"
+          :file-list="tmpForm.kpCertificatesPicList"
           multiple>
           <i class="el-icon-plus"></i>
         </el-upload>
@@ -87,6 +87,10 @@ export default {
       isShowPicDialogVisible: false,
       dialogImageUrl: '',
       customerId: this.$store.state.customerId,
+      tmpForm: {
+        kpAuthorizationPicList: [],
+        kpCertificatesPicList: []
+      },
       submitForm: {
         kpType: 1,
         kpSiginType: 1,
@@ -172,9 +176,9 @@ export default {
               for (let i = 0; i < picList.length; i++) {
                 list.push({name: 'name' + i, url: picList[i]})
               }
-              self.submitForm.kpAuthorizationPicList = list
+              self.tmpForm.kpAuthorizationPicList = list
             } else {
-              _data.data.kpAuthorizationPicList = []
+              self.tmpForm.kpAuthorizationPicList = self.submitForm.kpAuthorizationPicList = []
             }
             if (_data.data.kpCertificatesPicList != null) {
               let picList = _data.data.kpCertificatesPicList
@@ -182,9 +186,9 @@ export default {
               for (let i = 0; i < picList.length; i++) {
                 list.push({name: 'name' + i, url: picList[i]})
               }
-              self.submitForm.kpCertificatesPicList = list
+              self.tmpForm.kpCertificatesPicList = list
             } else {
-              _data.data.kpCertificatesPicList = []
+              self.tmpForm.kpCertificatesPicList = self.submitForm.kpCertificatesPicList = []
             }
             if (_data.data.status === 1) {
               self.editDisabled = true
@@ -247,7 +251,8 @@ export default {
           let length = _data.data.length
           let index = _data.data.lastIndexOf('-')
           let _name = _data.data.substring(index + 1, length)
-          self.submitForm.kpCertificatesPicList.push({name: _name, url: _data.data})
+          self.tmpForm.kpCertificatesPicList.push({name: _name, url: _data.data})
+          self.submitForm.kpCertificatesPicList.push(_data.data)
           self.$message({
             message: '上传成功',
             type: 'success'
@@ -264,7 +269,8 @@ export default {
     },
     handleCertiPicRemove (file, fileList) {
       let fileUrl = file.url.slice(5, -1)
-      let index = this.submitForm.kpCertificatesPicList.indexOf(fileUrl, 0)
+      let index = this.tmpForm.kpCertificatesPicList.indexOf(fileUrl, 0)
+      this.tmpForm.kpCertificatesPicList.splice(index, 1)
       this.submitForm.kpCertificatesPicList.splice(index, 1)
     },
     handlePicCardPreview (file) {
@@ -286,7 +292,8 @@ export default {
           let length = _data.data.length
           let index = _data.data.lastIndexOf('-')
           let _name = _data.data.substring(index + 1, length)
-          self.submitForm.kpAuthorizationPicList.push({name: _name, url: _data.data})
+          self.tmpForm.kpAuthorizationPicList.push({name: _name, url: _data.data})
+          self.submitForm.kpAuthorizationPicList.push(_data.data)
           self.$message({
             message: '上传成功',
             type: 'success'
@@ -303,7 +310,8 @@ export default {
     },
     handleAuthorPicRemove (file, fileList) {
       let fileUrl = file.url.slice(5, -1)
-      let index = this.submitForm.kpAuthorizationPicList.indexOf(fileUrl, 0)
+      let index = this.tmpForm.kpAuthorizationPicList.indexOf(fileUrl, 0)
+      this.tmpForm.kpAuthorizationPicList.splice(index, 1)
       this.submitForm.kpAuthorizationPicList.splice(index, 1)
     }
   }

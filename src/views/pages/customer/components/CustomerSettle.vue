@@ -167,14 +167,13 @@ export default {
   mounted  () {
     let user = this.$cookies.get('user')
     if (user != null) {
-      this.tempForm = this.submitForm
+      this.tempForm = JSON.parse(JSON.stringify(this.submitForm))
       this.fetchProvinces()
       this.customerId = this.$store.state.customerId
       if (this.customerId > 0) {
         this.fetchData()
       }
     }
-    
   },
   methods: {
     onSubmit () {
@@ -262,7 +261,7 @@ export default {
       })
     },
     addSettle () {
-      this.submitForm = this.tempForm
+      this.submitForm = JSON.parse(JSON.stringify(this.tempForm))
       this.isShowEditVisible = true
     },
     deleteSettle (row) {
